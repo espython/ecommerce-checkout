@@ -1,6 +1,5 @@
 // src/features/cart/hooks/useCart.ts
 import { useCallback } from 'react'
-
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 
 import {
@@ -11,6 +10,7 @@ import {
   validateCartItems,
   applyCoupon,
   removeCoupon,
+  setCartItems,
 } from '../store/cart-slice'
 import {
   useGetCartQuery,
@@ -75,24 +75,46 @@ export const useCart = () => {
   }
 }
 
-// New hook to wrap the RTK Query API hooks
+// Hook to wrap the RTK Query API hooks
 export const useCartApi = () => {
-  const { refetch: fetchCart } = useGetCartQuery()
+  const dispatch = useAppDispatch()
+  const {
+    data: cartItemsFromApi,
+    refetch: fetchCart,
+    isLoading,
+    error,
+  } = useGetCartQuery()
   const [clearCartMutation] = useClearCartMutation()
   const [validateCartMutation] = useValidateCartMutation()
   const cart = useAppSelector((state) => state.cart)
 
+  // Update Redux store with data from API when it loads
+  const fetchAndSetCart = useCallback(async () => {
+    try {
+      const result = await fetchCart().unwrap()
+      if (result) {
+        dispatch(setCartItems(result))
+        return result
+      }
+    } catch (error) {
+      console.error('Failed to fetch cart:', error)
+    }
+  }, [fetchCart, dispatch])
+
   const clearCart = useCallback(() => {
-    return clearCartMutation()
-  }, [clearCartMutation])
+    clearCartMutation()
+    dispatch(clearCartAction())
+  }, [clearCartMutation, dispatch])
 
   const validateCart = useCallback(() => {
     return validateCartMutation({ items: cart.items })
   }, [validateCartMutation, cart.items])
 
   return {
-    fetchCart,
+    fetchCart: fetchAndSetCart,
     clearCart,
     validateCart,
+    isLoading,
+    error,
   }
 }

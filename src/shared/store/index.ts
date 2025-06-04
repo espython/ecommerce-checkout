@@ -3,7 +3,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import { persistStore } from 'redux-persist'
 
 import { persistedReducer } from './root-reducer'
-import { apiSlice } from './api-slice'
 import { middleware } from './middleware'
 
 export const makeStore = () => {
@@ -16,7 +15,7 @@ export const makeStore = () => {
           ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
           ignoredPaths: ['items.dates'],
         },
-      }).concat(apiSlice.middleware, ...middleware),
+      }).concat(...middleware),
     devTools: process.env.NODE_ENV !== 'production',
   })
 }

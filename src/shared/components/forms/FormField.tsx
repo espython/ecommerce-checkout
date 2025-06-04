@@ -37,7 +37,7 @@ export function FormField<
 }: BaseFieldProps<TFieldValues, TName> & {
   render: (props: {
     field: any
-    fieldState: { error: any; invalid: boolean }
+    fieldState: { error?: any; invalid: boolean }
     formState: any
   }) => React.ReactElement
 }) {

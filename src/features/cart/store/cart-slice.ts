@@ -54,6 +54,14 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    setCartItems: (state, action: PayloadAction<CartItem[]>) => {
+      state.items = action.payload
+      const totals = calculateCartTotals(state.items)
+      state.subtotal = totals.subtotal
+      state.totalItems = totals.totalItems
+      state.lastUpdated = new Date().toISOString()
+    },
+
     addToCart: (
       state,
       action: PayloadAction<{ product: Product; quantity: number }>
@@ -170,6 +178,7 @@ export const cartSlice = createSlice({
 })
 
 export const {
+  setCartItems,
   addToCart,
   removeFromCart,
   updateQuantity,

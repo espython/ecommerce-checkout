@@ -1,4 +1,4 @@
-import { apiSlice } from '@/store/api-slice'
+import { apiSlice } from '@/shared/store/api-slice'
 import type { CartItem, Product, ValidatedCartItem } from '../types/cart.types'
 
 // Response type for validateCartItems
@@ -18,10 +18,46 @@ interface AddToCartRequest {
   }
 }
 
+// FakeStore API product type
+interface FakeStoreProduct {
+  id: number
+  title: string
+  price: number
+  description: string
+  category: string
+  image: string
+  rating: {
+    rate: number
+    count: number
+  }
+}
+
+// Transform FakeStore products to our Product structure
+const transformFakeStoreProducts = (
+  products: FakeStoreProduct[]
+): CartItem[] => {
+  return products.map((item) => ({
+    product: {
+      id: item.id.toString(),
+      name: item.title,
+      price: item.price,
+      image: item.image,
+      description: item.description,
+      category: item.category,
+      rating: item.rating.rate,
+      inventory: item.rating.count, // Using rating count as inventory for demo
+    },
+    quantity: 1,
+    addedAt: new Date().toISOString(),
+  }))
+}
+
 export const cartApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCart: builder.query<CartItem[], void>({
-      query: () => '/cart',
+      query: () => '/products?limit=4',
+      transformResponse: (response: FakeStoreProduct[]) =>
+        transformFakeStoreProducts(response),
       providesTags: ['Cart'],
     }),
 
