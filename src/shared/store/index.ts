@@ -2,12 +2,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { persistStore } from 'redux-persist'
 
-import { rootReducer } from './rootReducer'
-import { rtkQueryErrorLogger } from './middleware'
+import { persistedReducer } from './root-reducer'
+import { apiSlice } from './api-slice'
+import { middleware } from './middleware'
 
 export const makeStore = () => {
   return configureStore({
-    reducer: rootReducer,
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
@@ -15,7 +16,7 @@ export const makeStore = () => {
           ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
           ignoredPaths: ['items.dates'],
         },
-      }).concat(rtkQueryErrorLogger),
+      }).concat(apiSlice.middleware, ...middleware),
     devTools: process.env.NODE_ENV !== 'production',
   })
 }
