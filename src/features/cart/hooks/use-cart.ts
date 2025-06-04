@@ -7,11 +7,16 @@ import {
   addToCart,
   removeFromCart,
   updateQuantity,
-  clearCart,
+  clearCart as clearCartAction,
   validateCartItems,
   applyCoupon,
   removeCoupon,
 } from '../store/cart-slice'
+import {
+  useGetCartQuery,
+  useClearCartMutation,
+  useValidateCartMutation,
+} from '../store/cart-api'
 import type { Product } from '../types/cart.types'
 
 export const useCart = () => {
@@ -40,7 +45,7 @@ export const useCart = () => {
   )
 
   const clearAllItems = useCallback(() => {
-    dispatch(clearCart())
+    dispatch(clearCartAction())
   }, [dispatch])
 
   const validateItems = useCallback(() => {
@@ -67,5 +72,27 @@ export const useCart = () => {
     validateItems,
     applyDiscountCoupon,
     removeDiscountCoupon,
+  }
+}
+
+// New hook to wrap the RTK Query API hooks
+export const useCartApi = () => {
+  const { refetch: fetchCart } = useGetCartQuery()
+  const [clearCartMutation] = useClearCartMutation()
+  const [validateCartMutation] = useValidateCartMutation()
+  const cart = useAppSelector((state) => state.cart)
+
+  const clearCart = useCallback(() => {
+    return clearCartMutation()
+  }, [clearCartMutation])
+
+  const validateCart = useCallback(() => {
+    return validateCartMutation({ items: cart.items })
+  }, [validateCartMutation, cart.items])
+
+  return {
+    fetchCart,
+    clearCart,
+    validateCart,
   }
 }
