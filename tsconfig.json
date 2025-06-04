@@ -22,7 +22,8 @@
       "@/types/*": ["./src/shared/types/*"],
       "@/store/*": ["./src/shared/store/*"],
       "@/hooks/*": ["./src/shared/hooks/*"],
-      "@/utils/*": ["./src/shared/lib/utils/*"]
+      "@/utils/*": ["./src/shared/lib/utils/*"],
+      "@/features/*": ["./src/features/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
