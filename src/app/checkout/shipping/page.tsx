@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { z } from 'zod'
 import { Card } from '@/shared/components/ui/card'
 import { useAppSelector } from '@/shared/hooks/redux'
 import {
@@ -13,18 +12,6 @@ import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
 import { Steps } from '@/shared/components/ui/steps'
 
 import { ShippingAddressForm } from '@/features/shipping/components/ShippingAddressForm'
-
-// Define the shipping form schema
-const shippingFormSchema = z.object({
-  fullName: z.string().min(2, { message: 'Please enter your full name' }),
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  phone: z.string().min(10, { message: 'Please enter a valid phone number' }),
-  address: z.string().min(5, { message: 'Please enter your address' }),
-  city: z.string().min(2, { message: 'Please enter your city' }),
-  state: z.string().min(2, { message: 'Please select your state' }),
-  zipCode: z.string().min(5, { message: 'Please enter a valid zip code' }),
-  country: z.string().min(2, { message: 'Please select your country' }),
-})
 
 export default function ShippingPage() {
   const router = useRouter()

@@ -130,6 +130,11 @@ export function ShippingAddressForm() {
     router.push('/checkout/payment')
   }
 
+  // Handle back button click
+  const handleBack = () => {
+    router.push('/checkout')
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2 mb-6">
@@ -142,6 +147,8 @@ export function ShippingAddressForm() {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
         submitText="Continue to Payment"
+        cancelText="Back to Cart"
+        onCancel={handleBack}
         defaultValues={{
           fullName: '',
           email: '',
