@@ -10,7 +10,8 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "type-check": "tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "debug": "next dev"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -33,6 +34,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.16.0",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.513.0",
     "next": "15.3.3",
     "react": "^19.0.0",
@@ -53,6 +55,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/google.maps": "^3.58.1",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.17.57",
     "@types/react": "^19",
     "@types/react-dom": "^19",

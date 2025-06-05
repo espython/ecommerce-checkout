@@ -31,9 +31,16 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
   const router = useRouter()
   const cartItems = useAppSelector(selectCartItems)
   const isEmpty = useAppSelector(selectIsCartEmpty)
-  const { isLoading, error } = useAppSelector(selectCartStatus)
+  const { error } = useAppSelector(selectCartStatus)
 
-  const { fetchCart, clearCart, validateCart: validateCartApi } = useCartApi()
+  const {
+    fetchCart,
+    clearCart,
+    validateCart: validateCartApi,
+    isFetching,
+    isClearing,
+    isValidating,
+  } = useCartApi()
 
   // Load cart data from API on component mount
   useEffect(() => {
@@ -60,7 +67,7 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
     clearCart()
   }
 
-  if (isLoading) {
+  if (isFetching) {
     return <CartSkeleton />
   }
 
@@ -112,9 +119,9 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
               variant="outline"
               size="sm"
               onClick={validateCart}
-              disabled={isLoading}
+              disabled={isFetching}
             >
-              {isLoading ? (
+              {isValidating ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                   Validating...
@@ -127,9 +134,16 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
               variant="ghost"
               size="sm"
               onClick={handleClearCart}
-              disabled={isLoading || isEmpty}
+              disabled={isFetching || isEmpty}
             >
-              Clear Cart
+              {isClearing ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Clearing...
+                </>
+              ) : (
+                'Clear Cart'
+              )}
             </Button>
           </div>
         </div>
@@ -150,17 +164,31 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
                 variant="outline"
                 size="sm"
                 onClick={validateCart}
-                disabled={isLoading}
+                disabled={isFetching}
               >
-                Validate Items
+                {isValidating ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Validating...
+                  </>
+                ) : (
+                  'Validate Items'
+                )}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleClearCart}
-                disabled={isLoading || isEmpty}
+                disabled={isFetching || isEmpty}
               >
-                Clear Cart
+                {isClearing ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Clearing...
+                  </>
+                ) : (
+                  'Clear Cart'
+                )}
               </Button>
             </div>
           )}
@@ -176,9 +204,16 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
                 variant="default"
                 size="lg"
                 onClick={checkout}
-                disabled={isLoading}
+                disabled={isFetching}
               >
-                Proceed to Checkout
+                {isFetching ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Proceed to Checkout'
+                )}
               </Button>
             </div>
           )}

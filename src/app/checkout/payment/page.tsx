@@ -11,6 +11,7 @@ import {
 } from '@stripe/react-stripe-js'
 import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
+import { BackButton } from '@/shared/components/ui/back-button'
 import { useAppSelector } from '@/shared/hooks/redux'
 import {
   selectCartItems,
@@ -20,6 +21,8 @@ import {
 import { CartSummary } from '@/features/cart/components/CartSummary'
 import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
 import { Steps } from '@/shared/components/ui/steps'
+import { CreditCard } from 'lucide-react'
+import Cookies from 'js-cookie'
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(
@@ -68,6 +71,13 @@ function PaymentForm() {
       // Simulate processing delay
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
+      // Set a cookie to indicate order completion
+      // Set expiry to 1 hour - adjust as needed
+      Cookies.set('order_completed', 'true', {
+        expires: 1 / 24,
+        sameSite: 'strict',
+      })
+
       // Navigate to confirmation page
       router.push('/checkout/confirmation')
     } catch (error) {
@@ -86,44 +96,54 @@ function PaymentForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Card Details</h3>
-        <div className="p-4 border rounded-md">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#424770',
-                  '::placeholder': {
-                    color: '#aab7c4',
+    <div className="space-y-6">
+      <div className="flex items-center mb-6">
+        <BackButton
+          onClick={handleBack}
+          label="Back to shipping"
+          className="mr-2"
+        />
+        <div className="flex items-center space-x-2">
+          <CreditCard className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Payment Details</h2>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div className="p-4 border rounded-md">
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                  invalid: {
+                    color: '#9e2146',
                   },
                 },
-                invalid: {
-                  color: '#9e2146',
-                },
-              },
-            }}
-          />
+              }}
+            />
+          </div>
+
+          {paymentError && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+              {paymentError}
+            </div>
+          )}
         </div>
 
-        {paymentError && (
-          <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
-            {paymentError}
-          </div>
-        )}
-      </div>
-
-      <div className="pt-4 flex justify-between">
-        <Button type="button" variant="outline" onClick={handleBack}>
-          Back to Shipping
-        </Button>
-        <Button type="submit" disabled={!stripe || isProcessing}>
-          {isProcessing ? 'Processing...' : 'Complete Order'}
-        </Button>
-      </div>
-    </form>
+        <div className="pt-4 flex justify-end">
+          <Button type="submit" disabled={!stripe || isProcessing}>
+            {isProcessing ? 'Processing...' : 'Complete Order'}
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 }
 

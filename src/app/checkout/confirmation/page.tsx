@@ -8,7 +8,6 @@ import { useAppSelector, useAppDispatch } from '@/shared/hooks/redux'
 import {
   selectCartItems,
   selectIsCartEmpty,
-  selectCartTotal,
 } from '@/features/cart/store/cart-selectors'
 import { CartSummary } from '@/features/cart/components/CartSummary'
 import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
@@ -33,6 +32,18 @@ export default function ConfirmationPage() {
     if (isEmpty) {
       router.push('/checkout')
     }
+
+    // Prevent going back with browser history
+    history.pushState(null, '', window.location.href)
+    window.addEventListener('popstate', () => {
+      history.pushState(null, '', window.location.href)
+    })
+
+    return () => {
+      window.removeEventListener('popstate', () => {
+        history.pushState(null, '', window.location.href)
+      })
+    }
   }, [isEmpty, router])
 
   const steps = [
@@ -56,7 +67,7 @@ export default function ConfirmationPage() {
         <Steps steps={steps} currentStep={4} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Main confirmation area */}
         <div className="lg:col-span-2">
           <Card className="p-6 mb-6">
@@ -126,27 +137,6 @@ export default function ConfirmationPage() {
               </Button>
             </div>
           </Card>
-        </div>
-
-        {/* Order summary sidebar */}
-        <div className="lg:col-span-1">
-          <Card className="p-6 mb-6">
-            <h3 className="font-medium mb-3">Order Summary</h3>
-            <div className="divide-y">
-              {cartItems.map((item) => (
-                <CartItemCompact key={item.product.id} item={item} />
-              ))}
-            </div>
-          </Card>
-
-          <CartSummary />
-
-          <div className="mt-4 bg-blue-50 p-4 rounded-md border border-blue-100">
-            <p className="text-sm text-blue-700">
-              A confirmation email has been sent to your email address with all
-              the details of your order.
-            </p>
-          </div>
         </div>
       </div>
     </div>

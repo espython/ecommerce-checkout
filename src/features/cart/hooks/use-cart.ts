@@ -1,5 +1,5 @@
 // src/features/cart/hooks/useCart.ts
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 
 import {
@@ -11,6 +11,8 @@ import {
   applyCoupon,
   removeCoupon,
   setCartItems,
+  setLoading,
+  setError,
 } from '../store/cart-slice'
 import {
   useGetCartQuery,
@@ -81,12 +83,25 @@ export const useCartApi = () => {
   const {
     data: cartItemsFromApi,
     refetch: fetchCart,
-    isLoading,
-    error,
+    isLoading: isFetching,
+    error: fetchError,
   } = useGetCartQuery()
-  const [clearCartMutation] = useClearCartMutation()
-  const [validateCartMutation] = useValidateCartMutation()
+  const [clearCartMutation, { isLoading: isClearing }] = useClearCartMutation()
+  const [validateCartMutation, { isLoading: isValidating }] =
+    useValidateCartMutation()
   const cart = useAppSelector((state) => state.cart)
+
+  // Effect to sync loading states with global state
+  useEffect(() => {
+    // Set global loading state based on any operation in progress
+    const isAnyLoading = isFetching || isClearing || isValidating
+    dispatch(setLoading(isAnyLoading))
+
+    // Set global error state
+    if (fetchError) {
+      dispatch(setError((fetchError as any).message || 'Error fetching cart'))
+    }
+  }, [isFetching, isClearing, isValidating, fetchError, dispatch])
 
   // Update Redux store with data from API when it loads
   const fetchAndSetCart = useCallback(async () => {
@@ -94,27 +109,49 @@ export const useCartApi = () => {
       const result = await fetchCart().unwrap()
       if (result) {
         dispatch(setCartItems(result))
+        dispatch(setError(null))
         return result
       }
     } catch (error) {
       console.error('Failed to fetch cart:', error)
+      dispatch(setError('Failed to fetch cart'))
     }
   }, [fetchCart, dispatch])
 
-  const clearCart = useCallback(() => {
-    clearCartMutation()
-    dispatch(clearCartAction())
+  const clearCart = useCallback(async () => {
+    try {
+      await clearCartMutation().unwrap()
+      dispatch(clearCartAction())
+      dispatch(setError(null))
+    } catch (error) {
+      console.error('Failed to clear cart:', error)
+      dispatch(setError('Failed to clear cart'))
+    }
   }, [clearCartMutation, dispatch])
 
-  const validateCart = useCallback(() => {
-    return validateCartMutation({ items: cart.items })
-  }, [validateCartMutation, cart.items])
+  const validateCart = useCallback(async () => {
+    try {
+      const result = await validateCartMutation({ items: cart.items }).unwrap()
+      dispatch(setError(null))
+      return result
+    } catch (error) {
+      dispatch(setError('Failed to validate cart'))
+      return null
+    }
+  }, [validateCartMutation, cart.items, dispatch])
+
+  // Combined loading state for any cart operation
+  const isLoading = isFetching || isClearing || isValidating
 
   return {
     fetchCart: fetchAndSetCart,
     clearCart,
     validateCart,
     isLoading,
-    error,
+    isFetching,
+    isClearing,
+    isValidating,
+    error: fetchError,
+    cartItemsFromApi,
   }
 }

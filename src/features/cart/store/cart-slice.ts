@@ -133,6 +133,16 @@ export const cartSlice = createSlice({
       state.appliedCoupon = undefined
       state.lastUpdated = new Date().toISOString()
     },
+
+    // Set global loading state
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload
+    },
+
+    // Set error state
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload
+    },
   },
 
   extraReducers: (builder) => {
@@ -184,4 +194,6 @@ export const {
   updateQuantity,
   clearCart,
   removeCoupon,
+  setLoading,
+  setError,
 } = cartSlice.actions
