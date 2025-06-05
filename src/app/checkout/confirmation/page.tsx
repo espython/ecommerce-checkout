@@ -20,7 +20,6 @@ export default function ConfirmationPage() {
   const router = useRouter()
   const cartItems = useAppSelector(selectCartItems)
   const isEmpty = useAppSelector(selectIsCartEmpty)
-  const cartTotal = useAppSelector(selectCartTotal)
   const dispatch = useAppDispatch()
   const orderNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`
   const orderDate = new Date().toLocaleDateString('en-US', {
@@ -29,22 +28,12 @@ export default function ConfirmationPage() {
     day: 'numeric',
   })
 
-  console.log('cart is empty: ', isEmpty)
   // If cart is empty and not a recent order, redirect back to cart
   useEffect(() => {
     if (isEmpty) {
       router.push('/checkout')
     }
   }, [isEmpty, router])
-
-  // Clear cart when leaving the confirmation page
-  useEffect(() => {
-    return () => {
-      if (!isEmpty) {
-        dispatch(clearCart())
-      }
-    }
-  }, [dispatch, isEmpty])
 
   const steps = [
     { id: 1, name: 'Cart Review' },
@@ -53,13 +42,9 @@ export default function ConfirmationPage() {
     { id: 4, name: 'Confirmation' },
   ]
 
-  // if (isEmpty) {
-  //   return null
-  // }
-
   const handleContinueShopping = () => {
     dispatch(clearCart())
-    router.push('/')
+    router.push('/checkout')
   }
 
   return (

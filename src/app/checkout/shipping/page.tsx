@@ -1,14 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
-import { Input } from '@/shared/components/ui/input'
-import { FormField } from '@/shared/components/forms/FormField'
 import { useAppSelector } from '@/shared/hooks/redux'
 import {
   selectCartItems,
@@ -17,14 +11,8 @@ import {
 import { CartSummary } from '@/features/cart/components/CartSummary'
 import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
 import { Steps } from '@/shared/components/ui/steps'
-import { Label } from '@/shared/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select'
+
+import { ShippingAddressForm } from '@/features/shipping/components/ShippingAddressForm'
 
 // Define the shipping form schema
 const shippingFormSchema = z.object({
@@ -38,36 +26,14 @@ const shippingFormSchema = z.object({
   country: z.string().min(2, { message: 'Please select your country' }),
 })
 
-type ShippingFormValues = z.infer<typeof shippingFormSchema>
-
 export default function ShippingPage() {
   const router = useRouter()
   const cartItems = useAppSelector(selectCartItems)
   const isEmpty = useAppSelector(selectIsCartEmpty)
 
-  // Setup form with zod validation
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ShippingFormValues>({
-    resolver: zodResolver(shippingFormSchema),
-    defaultValues: {
-      fullName: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: 'US',
-    },
-  })
-
   // If cart is empty, redirect back to cart
   if (isEmpty) {
     router.push('/checkout')
-    return null
   }
 
   const steps = [
@@ -76,13 +42,6 @@ export default function ShippingPage() {
     { id: 3, name: 'Payment' },
     { id: 4, name: 'Confirmation' },
   ]
-
-  const onSubmit = (data: ShippingFormValues) => {
-    console.log('Shipping form data:', data)
-    // In a real app, you would save this data to your state
-    // and then navigate to the payment page
-    router.push('/checkout/payment')
-  }
 
   const handleBack = () => {
     router.push('/checkout')
@@ -103,146 +62,7 @@ export default function ShippingPage() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-4">
-                <FormField
-                  control={control}
-                  name="fullName"
-                  label="Full Name"
-                  required
-                  render={({ field, fieldState }) => (
-                    <Input
-                      {...field}
-                      placeholder="John Doe"
-                      error={fieldState.error?.message}
-                    />
-                  )}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={control}
-                    name="email"
-                    label="Email Address"
-                    required
-                    render={({ field, fieldState }) => (
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="your@email.com"
-                        error={fieldState.error?.message}
-                      />
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="phone"
-                    label="Phone Number"
-                    required
-                    render={({ field, fieldState }) => (
-                      <Input
-                        {...field}
-                        placeholder="(123) 456-7890"
-                        error={fieldState.error?.message}
-                      />
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={control}
-                  name="address"
-                  label="Street Address"
-                  required
-                  render={({ field, fieldState }) => (
-                    <Input
-                      {...field}
-                      placeholder="123 Main St"
-                      error={fieldState.error?.message}
-                    />
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={control}
-                    name="city"
-                    label="City"
-                    required
-                    render={({ field, fieldState }) => (
-                      <Input
-                        {...field}
-                        placeholder="New York"
-                        error={fieldState.error?.message}
-                      />
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="state"
-                    label="State / Province"
-                    required
-                    render={({ field, fieldState }) => (
-                      <Input
-                        {...field}
-                        placeholder="NY"
-                        error={fieldState.error?.message}
-                      />
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={control}
-                    name="zipCode"
-                    label="Zip / Postal Code"
-                    required
-                    render={({ field, fieldState }) => (
-                      <Input
-                        {...field}
-                        placeholder="10001"
-                        error={fieldState.error?.message}
-                      />
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="country"
-                    label="Country"
-                    required
-                    render={({ field }) => (
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="US">United States</SelectItem>
-                          <SelectItem value="CA">Canada</SelectItem>
-                          <SelectItem value="UK">United Kingdom</SelectItem>
-                          <SelectItem value="AU">Australia</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex justify-between">
-                <Button type="button" variant="outline" onClick={handleBack}>
-                  Back to Cart
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Processing...' : 'Continue to Payment'}
-                </Button>
-              </div>
-            </form>
+            <ShippingAddressForm />
           </Card>
         </div>
 

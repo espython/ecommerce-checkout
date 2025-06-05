@@ -121,7 +121,7 @@ export function FormGenerator<T extends FieldValues>({
                     required={field.required}
                     icon={field.icon}
                     iconPosition={field.iconPosition}
-                    disabled={field.disabled || isLoading}
+                    // disabled={field.disabled || isLoading}
                     autoComplete={field.autoComplete}
                     maxLength={field.maxLength}
                   />

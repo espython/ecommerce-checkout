@@ -67,7 +67,7 @@ export function TextField<
             placeholder={placeholder}
             autoComplete={autoComplete}
             maxLength={maxLength}
-            disabled={disabled || fieldState.invalid}
+            disabled={disabled}
             className={`${inputClassName} ${fieldState.error ? 'border-red-500 focus:border-red-500' : ''} 
                        ${iconPosition === 'start' && icon ? 'pl-10' : ''} 
                        ${iconPosition === 'end' && icon ? 'pr-10' : ''}`}

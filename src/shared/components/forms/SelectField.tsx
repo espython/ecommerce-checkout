@@ -59,7 +59,7 @@ export function SelectField<
         <Select
           defaultValue={field.value}
           onValueChange={field.onChange}
-          disabled={disabled || fieldState.invalid}
+          disabled={disabled}
         >
           <SelectTrigger
             className={`w-full ${selectClassName} ${

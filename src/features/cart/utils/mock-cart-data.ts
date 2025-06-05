@@ -1,6 +1,6 @@
 import { Product } from '../types/cart.types'
 import { addToCart } from '../store/cart-slice'
-import { store } from '@/shared/store'
+import { makeStore } from '@/shared/store/index'
 
 // Sample product data
 export const mockProducts: Product[] = [
@@ -65,7 +65,7 @@ export const populateCartWithMockData = (productCount: number = 2) => {
     const product = mockProducts[i]
     const quantity = Math.floor(Math.random() * 2) + 1 // Random quantity 1-3
 
-    store.dispatch(addToCart({ product, quantity }))
+    makeStore().dispatch(addToCart({ product, quantity }))
   }
 }
 
@@ -82,7 +82,7 @@ export const addSpecificProductToCart = (
   const product = mockProducts.find((p) => p.id === productId)
 
   if (product) {
-    store.dispatch(addToCart({ product, quantity }))
+    makeStore().dispatch(addToCart({ product, quantity }))
     return true
   }
 
