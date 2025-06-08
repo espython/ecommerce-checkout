@@ -1,7 +1,6 @@
 // src/features/cart/hooks/useCart.ts
 import { useCallback, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
-
 import {
   addToCart,
   removeFromCart,
@@ -19,7 +18,8 @@ import {
   useClearCartMutation,
   useValidateCartMutation,
 } from '../store/cart-api'
-import type { Product } from '../types/cart.types'
+import type { CartItem, Product } from '../types/cart.types'
+import { mockProducts } from '../utils/mock-cart-data'
 
 export const useCart = () => {
   const dispatch = useAppDispatch()
@@ -105,6 +105,7 @@ export const useCartApi = () => {
 
   // Update Redux store with data from API when it loads
   const fetchAndSetCart = useCallback(async () => {
+    dispatch(setLoading(true))
     try {
       const result = await fetchCart().unwrap()
       if (result) {
@@ -114,7 +115,26 @@ export const useCartApi = () => {
       }
     } catch (error) {
       console.error('Failed to fetch cart:', error)
-      dispatch(setError('Failed to fetch cart'))
+
+      // Create mock cart items (2 products by default)
+      const mockCartItems: CartItem[] = mockProducts
+        .slice(0, 2)
+        .map((product) => ({
+          id: product.id,
+          product,
+          quantity: Math.floor(Math.random() * 2) + 1,
+          addedAt: new Date().toISOString(),
+        }))
+
+      // Populate the store with mock data
+      dispatch(setCartItems(mockCartItems))
+
+      // Set a warning instead of an error since we're recovering with mock data
+      dispatch(setError('Using sample cart data - failed to fetch from server'))
+
+      return mockCartItems
+    } finally {
+      dispatch(setLoading(false))
     }
   }, [fetchCart, dispatch])
 

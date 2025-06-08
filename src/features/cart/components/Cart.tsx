@@ -198,7 +198,7 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
         <div className="lg:col-span-1">
           <CartSummary />
 
-          {!hideControls && (
+          {/* {!hideControls && (
             <div className="mt-4">
               <Button
                 variant="default"
@@ -216,7 +216,7 @@ export function Cart({ hideTitle = false, hideControls = false }: CartProps) {
                 )}
               </Button>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

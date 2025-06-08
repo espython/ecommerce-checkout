@@ -9,17 +9,21 @@ import {
   selectCartItems,
   selectIsCartEmpty,
 } from '@/features/cart/store/cart-selectors'
-import { CartSummary } from '@/features/cart/components/CartSummary'
-import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
-import { Steps } from '@/shared/components/ui/steps'
 import { clearCart } from '@/features/cart/store/cart-slice'
 import { CheckCircle } from 'lucide-react'
+import {
+  setCurrentStep,
+  resetCheckout,
+  completeCheckout,
+  selectIsCheckoutComplete,
+} from '@/features/checkout/store/checkout-slice'
 
 export default function ConfirmationPage() {
   const router = useRouter()
   const cartItems = useAppSelector(selectCartItems)
   const isEmpty = useAppSelector(selectIsCartEmpty)
   const dispatch = useAppDispatch()
+  const isCheckoutComplete = useAppSelector(selectIsCheckoutComplete)
   const orderNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`
   const orderDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -27,9 +31,15 @@ export default function ConfirmationPage() {
     day: 'numeric',
   })
 
+  // Set current step and mark checkout as complete
+  useEffect(() => {
+    dispatch(setCurrentStep(4))
+    dispatch(completeCheckout())
+  }, [dispatch])
+
   // If cart is empty and not a recent order, redirect back to cart
   useEffect(() => {
-    if (isEmpty) {
+    if (isEmpty && !isCheckoutComplete) {
       router.push('/checkout')
     }
 
@@ -44,28 +54,17 @@ export default function ConfirmationPage() {
         history.pushState(null, '', window.location.href)
       })
     }
-  }, [isEmpty, router])
-
-  const steps = [
-    { id: 1, name: 'Cart Review' },
-    { id: 2, name: 'Shipping Information' },
-    { id: 3, name: 'Payment' },
-    { id: 4, name: 'Confirmation' },
-  ]
+  }, [isEmpty, router, isCheckoutComplete])
 
   const handleContinueShopping = () => {
     dispatch(clearCart())
+    dispatch(resetCheckout())
     router.push('/checkout')
   }
 
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-
-      {/* Progress tracker */}
-      <div className="mb-12">
-        <Steps steps={steps} currentStep={4} />
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Main confirmation area */}

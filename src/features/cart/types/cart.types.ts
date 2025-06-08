@@ -20,6 +20,7 @@ export interface ValidatedCartItem {
 }
 
 export interface CartItem {
+  id: string
   product: Product
   quantity: number
   selectedVariant?: {

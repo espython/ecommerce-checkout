@@ -1,31 +1,88 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { Check } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
+import {
+  selectCheckoutSteps,
+  selectCurrentStepId,
+  setCurrentStep,
+  selectIsCheckoutComplete,
+} from '@/features/checkout/store/checkout-slice'
 
 interface Step {
   id: number
   name: string
+  path?: string
+  completed?: boolean
 }
 
 interface StepsProps {
-  steps: Step[]
-  currentStep: number
+  steps?: Step[]
+  currentStep?: number
   className?: string
+  allowNavigation?: boolean
 }
 
-export function Steps({ steps, currentStep, className }: StepsProps) {
+export function Steps({
+  // Optional props to override redux state if needed
+  steps: propSteps,
+  currentStep: propCurrentStep,
+  className,
+  allowNavigation = true,
+}: StepsProps) {
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+
+  // Use props if provided, otherwise use Redux state
+  const reduxSteps = useAppSelector(selectCheckoutSteps)
+  const reduxCurrentStep = useAppSelector(selectCurrentStepId)
+  const isCheckoutComplete = useAppSelector(selectIsCheckoutComplete)
+
+  const steps = propSteps || reduxSteps
+  const currentStep = propCurrentStep || reduxCurrentStep
+
+  // Handle step click for navigation
+  const handleStepClick = (step: Step) => {
+    if (!allowNavigation) return
+
+    // Don't allow navigation to future uncompleted steps
+    if (!step.completed && step.id > currentStep) return
+
+    // Don't allow navigation away from confirmation once completed
+    if (isCheckoutComplete && currentStep === 4) return
+
+    // Update Redux state
+    dispatch(setCurrentStep(step.id))
+
+    // Navigate to the step's path if available
+    if (step.path) {
+      router.push(step.path)
+    }
+  }
+
   return (
     <nav aria-label="Progress" className={cn('w-full', className)}>
       <ol role="list" className="flex items-center">
         {steps.map((step, index) => {
-          const isCompleted = currentStep > step.id
+          const isCompleted = step.completed || currentStep > step.id
           const isCurrent = currentStep === step.id
           const isLast = index === steps.length - 1
+          const isClickable =
+            allowNavigation && (isCompleted || step.id <= currentStep)
 
           return (
-            <li key={step.name} className={cn('relative', !isLast && 'flex-1')}>
+            <li
+              key={step.name}
+              className={cn(
+                'relative',
+                !isLast && 'flex-1',
+                isClickable && 'cursor-pointer'
+              )}
+              onClick={() => isClickable && handleStepClick(step)}
+            >
               <div className="flex items-center">
                 {/* Complete or current step */}
                 <div
@@ -80,7 +137,8 @@ export function Steps({ steps, currentStep, className }: StepsProps) {
                       ? 'text-primary font-semibold'
                       : isCompleted
                         ? 'text-gray-900'
-                        : 'text-gray-500'
+                        : 'text-gray-500',
+                    isClickable && 'hover:text-primary transition-colors'
                   )}
                 >
                   {step.name}

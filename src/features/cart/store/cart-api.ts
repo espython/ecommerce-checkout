@@ -37,6 +37,7 @@ const transformFakeStoreProducts = (
   products: FakeStoreProduct[]
 ): CartItem[] => {
   return products.map((item) => ({
+    id: item.id.toString(),
     product: {
       id: item.id.toString(),
       name: item.title,
@@ -46,6 +47,13 @@ const transformFakeStoreProducts = (
       category: item.category,
       rating: item.rating.rate,
       inventory: item.rating.count, // Using rating count as inventory for demo
+      inStock: item.rating.count, // Repurposing the rating count as inStock
+      weight: 1.0, // Default weight
+      dimensions: {
+        length: 10,
+        width: 10,
+        height: 5,
+      },
     },
     quantity: 1,
     addedAt: new Date().toISOString(),

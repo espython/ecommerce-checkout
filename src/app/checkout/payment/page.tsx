@@ -12,7 +12,7 @@ import {
 import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
 import { BackButton } from '@/shared/components/ui/back-button'
-import { useAppSelector } from '@/shared/hooks/redux'
+import { useAppSelector, useAppDispatch } from '@/shared/hooks/redux'
 import {
   selectCartItems,
   selectIsCartEmpty,
@@ -22,7 +22,14 @@ import { CartSummary } from '@/features/cart/components/CartSummary'
 import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
 import { Steps } from '@/shared/components/ui/steps'
 import { CreditCard } from 'lucide-react'
-import Cookies from 'js-cookie'
+import {
+  setCurrentStep,
+  nextStep,
+  prevStep,
+  completeCheckout,
+  selectPreviousStep,
+  selectNextStep,
+} from '@/features/checkout/store/checkout-slice'
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(
@@ -32,10 +39,13 @@ const stripePromise = loadStripe(
 // PaymentForm component that uses Stripe hooks
 function PaymentForm() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
+  const nextStepInfo = useAppSelector(selectNextStep)
+  const previousStepInfo = useAppSelector(selectPreviousStep)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,12 +81,16 @@ function PaymentForm() {
       // Simulate processing delay
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      // Set a cookie to indicate order completion
-      // Set expiry to 1 hour - adjust as needed
-      Cookies.set('order_completed', 'true', {
-        expires: 1 / 24,
-        sameSite: 'strict',
-      })
+      // Set a cookie to indicate order completion - expires in 1 hour
+      const expiryDate = new Date()
+      expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000) // 1 hour
+      document.cookie = `order_completed=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`
+
+      // Complete the checkout in Redux
+      dispatch(completeCheckout())
+
+      // Move to next step
+      dispatch(nextStep())
 
       // Navigate to confirmation page
       router.push('/checkout/confirmation')
@@ -92,7 +106,10 @@ function PaymentForm() {
   }
 
   const handleBack = () => {
-    router.push('/checkout/shipping')
+    if (previousStepInfo) {
+      dispatch(prevStep())
+      router.push(previousStepInfo.path)
+    }
   }
 
   return (
@@ -149,10 +166,16 @@ function PaymentForm() {
 
 export default function PaymentPage() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const cartItems = useAppSelector(selectCartItems)
   const isEmpty = useAppSelector(selectIsCartEmpty)
   const cartTotal = useAppSelector(selectCartTotal)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Set current step when landing on this page
+  useEffect(() => {
+    dispatch(setCurrentStep(3))
+  }, [dispatch])
 
   useEffect(() => {
     // If cart is empty, redirect back to cart
@@ -169,13 +192,6 @@ export default function PaymentPage() {
     return () => clearTimeout(timer)
   }, [isEmpty, router])
 
-  const steps = [
-    { id: 1, name: 'Cart Review' },
-    { id: 2, name: 'Shipping Information' },
-    { id: 3, name: 'Payment' },
-    { id: 4, name: 'Confirmation' },
-  ]
-
   // Return early if loading
   if (isLoading) {
     return (
@@ -183,7 +199,7 @@ export default function PaymentPage() {
         <h1 className="text-3xl font-bold mb-6">Checkout</h1>
 
         <div className="mb-12">
-          <Steps steps={steps} currentStep={3} />
+          <Steps />
         </div>
 
         <div className="flex justify-center items-center py-20">
@@ -208,11 +224,6 @@ export default function PaymentPage() {
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-
-      {/* Progress tracker */}
-      <div className="mb-12">
-        <Steps steps={steps} currentStep={3} />
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main checkout area */}

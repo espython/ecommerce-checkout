@@ -6,15 +6,15 @@ import storage from 'redux-persist/lib/storage'
 import { apiSlice } from './api-slice'
 import { cartSlice } from '@/features/cart/store/cart-slice'
 import { shippingSlice } from '@/features/shipping/store/shipping-slice'
-//Todo: implement payment, order, checkoutFlow
+import { checkoutSlice } from '@/features/checkout/store/checkout-slice'
+//Todo: implement payment, order
 // import { paymentSlice } from '@/features/payment/store/paymentSlice'
 // import { orderSlice } from '@/features/order/store/orderSlice'
-// import { checkoutFlowSlice } from '@/features/checkout-flow/store/checkoutFlowSlice'
 
 const persistConfig = {
   key: 'ecommerce-checkout',
   storage,
-  whitelist: ['cart', 'shipping'],
+  whitelist: ['cart', 'shipping', 'checkout'],
   blacklist: ['payment', 'api'],
 }
 
@@ -22,10 +22,10 @@ const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   cart: cartSlice.reducer,
   shipping: shippingSlice.reducer,
-  //Todo: implement payment, order, checkoutFlow
+  checkout: checkoutSlice.reducer,
+  //Todo: implement payment, order
   // payment: paymentSlice.reducer,
   // order: orderSlice.reducer,
-  // checkoutFlow: checkoutFlowSlice.reducer,
 })
 
 export const persistedReducer = persistReducer(persistConfig, rootReducer)

@@ -1,10 +1,10 @@
 'use client'
-
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { useAppSelector } from '@/shared/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { formatCurrency } from '@/utils/format'
 import {
   selectCartTotal,
@@ -12,6 +12,11 @@ import {
   selectTax,
   selectShipping,
 } from '../store/cart-selectors'
+import {
+  nextStep,
+  selectNextStep,
+} from '@/features/checkout/store/checkout-slice'
+import { PaymentMethodIcons } from './PaymentMethodIcons'
 
 interface CartSummaryProps {
   className?: string
@@ -23,7 +28,10 @@ export function CartSummary({
   showCheckoutButton = true,
 }: CartSummaryProps) {
   const router = useRouter()
-
+  const dispatch = useAppDispatch()
+  const nextStepData = useAppSelector(selectNextStep)
+  const pathname = usePathname()
+  showCheckoutButton = pathname === '/checkout'
   // Get cart totals from the store
   const subtotal = useAppSelector(selectSubtotal)
   const shipping = useAppSelector(selectShipping)
@@ -31,7 +39,10 @@ export function CartSummary({
   const total = useAppSelector(selectCartTotal)
 
   const handleCheckout = () => {
-    router.push('/checkout')
+    if (nextStepData) {
+      dispatch(nextStep())
+      router.push(nextStepData.path)
+    }
   }
 
   return (
@@ -80,16 +91,7 @@ export function CartSummary({
         )}
 
         {/* Payment options */}
-        <div className="mt-4">
-          <p className="text-xs text-center text-gray-500 mb-2">We accept</p>
-          <div className="flex justify-center space-x-2">
-            {/* Payment icons could go here */}
-            <div className="h-8 w-12 bg-gray-200 rounded"></div>
-            <div className="h-8 w-12 bg-gray-200 rounded"></div>
-            <div className="h-8 w-12 bg-gray-200 rounded"></div>
-            <div className="h-8 w-12 bg-gray-200 rounded"></div>
-          </div>
-        </div>
+        <PaymentMethodIcons />
       </div>
     </div>
   )
