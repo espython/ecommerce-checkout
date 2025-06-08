@@ -56,7 +56,7 @@ export const selectCartTotal = createSelector(
 )
 
 // Select a single cart item by product ID
-export const selectCartItemById = (productId: string) =>
+export const selectCartItemById = (productId: number) =>
   createSelector([selectCartItems], (items) =>
     items.find((item) => item.product.id === productId)
   )

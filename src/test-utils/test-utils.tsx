@@ -1,13 +1,69 @@
 import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { AppStore, makeStore, RootState } from '@/shared/store'
+import { configureStore } from '@reduxjs/toolkit'
+import { AppStore, RootState } from '@/shared/store'
+import cartSlice, {
+  initialState as cartInitialState,
+} from '@/features/cart/store/cart-slice'
+import shippingSlice from '@/features/shipping/store/shipping-slice'
+import checkoutSlice from '@/features/checkout/store/checkout-slice'
+import { apiSlice } from '@/shared/store/api-slice'
 
 // Create a custom render function that includes Redux provider
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
   preloadedState?: Partial<RootState>
   store?: AppStore
 }
+
+// Create a test store with proper initial state
+function createTestStore(preloadedState: Partial<RootState> = {}) {
+  return configureStore({
+    reducer: {
+      api: apiSlice.reducer,
+      cart: cartSlice,
+      shipping: shippingSlice,
+      checkout: checkoutSlice,
+    },
+    preloadedState: {
+      cart: cartInitialState,
+      shipping: { address: null, saveAddress: false },
+      checkout: {
+        steps: [
+          { id: 1, name: 'Cart Review', path: '/checkout', completed: false },
+          {
+            id: 2,
+            name: 'Shipping Information',
+            path: '/checkout/shipping',
+            completed: false,
+          },
+          {
+            id: 3,
+            name: 'Payment',
+            path: '/checkout/payment',
+            completed: false,
+          },
+          {
+            id: 4,
+            name: 'Confirmation',
+            path: '/checkout/confirmation',
+            completed: false,
+          },
+        ],
+        currentStepId: 1,
+        isComplete: false,
+      },
+      ...preloadedState,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [apiSlice.util.resetApiState.type],
+        },
+      }).concat(apiSlice.middleware),
+  })
+}
+
 export function renderWithProviders(
   ui: ReactElement,
   extendedRenderOptions: ExtendedRenderOptions = {}
@@ -15,30 +71,16 @@ export function renderWithProviders(
   const {
     preloadedState = {},
     // Automatically create a store instance if no store was passed in
-    store = makeStore(),
+    store = createTestStore(preloadedState),
     ...renderOptions
   } = extendedRenderOptions
+
   function Wrapper({ children }: { children: React.ReactNode }) {
     return <Provider store={store}>{children}</Provider>
   }
 
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) }
 }
-
-// Mock cart hooks to avoid actual API calls in tests
-jest.mock('../features/cart/hooks/use-cart', () => ({
-  useCart: () => ({
-    updateItemQuantity: jest.fn(),
-    removeItem: jest.fn(),
-    addItem: jest.fn(),
-    clearCart: jest.fn(),
-    getCartTotal: jest.fn(() => 0),
-  }),
-  useCartApi: () => ({
-    validateCart: jest.fn(),
-    fetchCart: jest.fn(),
-  }),
-}))
 
 // Export everything from React Testing Library
 export * from '@testing-library/react'

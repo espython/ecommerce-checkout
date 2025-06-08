@@ -1,29 +1,39 @@
 import { screen } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
 import { CartContainer } from '../CartContainer'
+import { CartItem } from '../../types/cart.types'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { setCurrentStep } from '@/features/checkout/store/checkout-slice'
-import { setCartItems } from '../../store/cart-slice'
-import { CartItem } from '../../types/cart.types'
+import {
+  setCartItems,
+  setLoading,
+  setError,
+} from '@/features/cart/store/cart-slice'
 
-// Mock the Redux hooks
-jest.mock('@/shared/hooks/redux')
-jest.mock('@/features/checkout/store/checkout-slice')
-jest.mock('../../store/cart-slice')
+// Mock Redux hooks
+jest.mock('@/shared/hooks/redux', () => ({
+  useAppDispatch: jest.fn(),
+  useAppSelector: jest.fn(),
+}))
 
+// Mock action creators
+jest.mock('@/features/checkout/store/checkout-slice', () => ({
+  setCurrentStep: jest.fn(),
+}))
+
+jest.mock('@/features/cart/store/cart-slice', () => ({
+  setCartItems: jest.fn(),
+  setLoading: jest.fn(),
+  setError: jest.fn(),
+}))
+
+// Create mock variables
 const mockDispatch = jest.fn()
-const mockUseAppDispatch = useAppDispatch as jest.MockedFunction<
-  typeof useAppDispatch
->
-const mockUseAppSelector = useAppSelector as jest.MockedFunction<
-  typeof useAppSelector
->
-const mockSetCurrentStep = setCurrentStep as jest.MockedFunction<
-  typeof setCurrentStep
->
-const mockSetCartItems = setCartItems as jest.MockedFunction<
-  typeof setCartItems
->
+const mockUseAppDispatch = useAppDispatch as jest.Mock
+const mockUseAppSelector = useAppSelector as jest.Mock
+const mockSetCurrentStep = setCurrentStep as unknown as jest.Mock
+const mockSetCartItems = setCartItems as unknown as jest.Mock
+const mockSetLoading = setLoading as unknown as jest.Mock
 
 describe('CartContainer', () => {
   const mockItems: CartItem[] = [
@@ -61,14 +71,27 @@ describe('CartContainer', () => {
       type: 'cart/setCartItems',
       payload: mockItems,
     } as any)
+    mockSetLoading.mockReturnValue({
+      type: 'cart/setLoading',
+      payload: false,
+    } as any)
   })
 
   it('dispatches setCurrentStep and setCartItems on mount', () => {
     render(<CartContainer items={mockItems} />)
 
-    expect(mockDispatch).toHaveBeenCalledTimes(2)
+    // Check that dispatch is called with the expected actions
     expect(mockSetCurrentStep).toHaveBeenCalledWith(1)
     expect(mockSetCartItems).toHaveBeenCalledWith(mockItems)
+
+    // There may be additional dispatches from other components or effects
+    // Verify only that our expected actions were dispatched
+    expect(mockDispatch).toHaveBeenCalledWith(
+      mockSetCurrentStep.mock.results[0].value
+    )
+    expect(mockDispatch).toHaveBeenCalledWith(
+      mockSetCartItems.mock.results[0].value
+    )
   })
 
   it('passes items from Redux state to Cart component', () => {

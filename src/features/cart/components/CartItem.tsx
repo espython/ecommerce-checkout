@@ -67,6 +67,7 @@ export function CartItem({ item }: CartItemProps) {
             size={'icon'}
             variant={'ghost'}
             className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
+            aria-label="Decrease quantity"
           >
             <Minus className="h-4 w-4" />
           </Button>
@@ -78,6 +79,7 @@ export function CartItem({ item }: CartItemProps) {
             size={'icon'}
             variant={'ghost'}
             className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
+            aria-label="Increase quantity"
           >
             <Plus className="h-4 w-4" />
           </Button>

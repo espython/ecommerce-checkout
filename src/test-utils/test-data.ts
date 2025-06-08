@@ -6,12 +6,12 @@ export const mockCartItems: CartItem[] = [
     id: 1,
     product: {
       id: 1,
-      name: 'Product 1',
+      name: 'Test Product',
       price: 19.99,
       image: '/product1.jpg',
       description: 'Description 1',
       category: 'Category 1',
-      inStock: 1,
+      inStock: 10,
       weight: 1,
       dimensions: {
         length: 1,
@@ -19,8 +19,12 @@ export const mockCartItems: CartItem[] = [
         height: 1,
       },
     },
-    quantity: 1,
-    addedAt: new Date('2025-06-01').toISOString(), // Using a fixed date for consistent testing
+    quantity: 2,
+    selectedVariant: {
+      size: 'M',
+      color: 'Red',
+    },
+    addedAt: new Date('2025-06-01').toISOString(),
   },
   {
     id: 2,
@@ -31,7 +35,7 @@ export const mockCartItems: CartItem[] = [
       image: '/product2.jpg',
       description: 'Description 2',
       category: 'Category 2',
-      inStock: 2,
+      inStock: 5,
       weight: 2,
       dimensions: {
         length: 2,
@@ -39,7 +43,7 @@ export const mockCartItems: CartItem[] = [
         height: 2,
       },
     },
-    quantity: 2,
-    addedAt: new Date('2025-06-02').toISOString(), // Using a fixed date for consistent testing
+    quantity: 1,
+    addedAt: new Date('2025-06-02').toISOString(),
   },
 ]

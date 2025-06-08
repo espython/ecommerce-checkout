@@ -2,28 +2,77 @@ import { screen, fireEvent } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
 import { Cart } from '../Cart'
 import { useAppSelector } from '@/shared/hooks/redux'
-import { useCartApi } from '../../hooks/use-cart'
+import { useCartApi, useCart } from '../../hooks/use-cart'
+import { mockCartItems } from '@/test-utils/test-data'
+import { selectCartItems, selectCartStatus } from '../../store/cart-selectors'
 
 // Mock the hooks
 jest.mock('@/shared/hooks/redux')
-jest.mock('../../hooks/use-cart')
+jest.mock('../../hooks/use-cart', () => ({
+  useCartApi: jest.fn(),
+  useCart: jest.fn(),
+}))
 
-const mockUseAppSelector = useAppSelector as jest.MockedFunction<
-  typeof useAppSelector
->
-const mockUseCartApi = useCartApi as jest.MockedFunction<typeof useCartApi>
+const mockUseAppSelector = jest.mocked(useAppSelector)
+const mockUseCartApi = jest.mocked(useCartApi)
+const mockUseCart = jest.mocked(useCart)
+
+// Helper function to create a selector implementation
+const createSelectorMock = (errorValue: string | null = null) => {
+  return (selector: any) => {
+    // For selectCartStatus selector
+    if (selector === selectCartStatus) {
+      return { error: errorValue, isLoading: false }
+    }
+    // For selectCartItems and any other selector that expects an array
+    return mockCartItems
+  }
+}
 
 describe('Cart', () => {
   const mockValidateCart = jest.fn()
+  const mockUpdateItemQuantity = jest.fn()
+  const mockRemoveItem = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseAppSelector.mockReturnValue({ error: null })
-    mockUseCartApi.mockReturnValue({ validateCart: mockValidateCart })
+
+    // Default selector implementation
+    mockUseAppSelector.mockImplementation(createSelectorMock(null))
+
+    mockUseCartApi.mockReturnValue({
+      clearCart: jest.fn(),
+      validateCart: mockValidateCart,
+      isLoading: false,
+      isFetching: false,
+      isClearing: false,
+      isValidating: false,
+      error: undefined,
+      cartItemsFromApi: undefined,
+    })
+
+    // Mock useCart hook for CartItem component
+    mockUseCart.mockReturnValue({
+      cart: {
+        items: mockCartItems,
+        subtotal: 100,
+        totalItems: 8,
+        isLoading: false,
+        error: null,
+        lastUpdated: new Date().toISOString(),
+      },
+      addItem: jest.fn(),
+      removeItem: mockRemoveItem,
+      updateItemQuantity: mockUpdateItemQuantity,
+      clearAllItems: jest.fn(),
+      validateItems: jest.fn(),
+      applyDiscountCoupon: jest.fn(),
+      removeDiscountCoupon: jest.fn(),
+    })
   })
 
   it('renders loading skeleton when isLoading is true', () => {
-    render(<Cart items={mockItems} isLoading={true} />)
+    render(<Cart items={mockCartItems} isLoading={true} />)
 
     // CartSkeleton is mocked in jest.setup.js, but we can check that the component renders
     expect(screen.queryByText('Product 1')).not.toBeInTheDocument()
@@ -31,9 +80,12 @@ describe('Cart', () => {
   })
 
   it('renders error message when there is an error', () => {
-    mockUseAppSelector.mockReturnValue({ error: 'Failed to load cart' })
+    // Override the mock for this test case only
+    mockUseAppSelector.mockImplementation(
+      createSelectorMock('Failed to load cart')
+    )
 
-    render(<Cart items={mockItems} />)
+    render(<Cart items={mockCartItems} />)
 
     expect(screen.getByText('Error loading cart')).toBeInTheDocument()
     expect(screen.getByText('Failed to load cart')).toBeInTheDocument()
@@ -68,9 +120,12 @@ describe('Cart', () => {
   })
 
   it('does not render retry button when hideControls is true and there is an error', () => {
-    mockUseAppSelector.mockReturnValue({ error: 'Failed to load cart' })
+    // Override the mock for this test case only
+    mockUseAppSelector.mockImplementation(
+      createSelectorMock('Failed to load cart')
+    )
 
-    render(<Cart items={mockItems} hideControls={true} />)
+    render(<Cart items={mockCartItems} hideControls={true} />)
 
     expect(screen.getByText('Error loading cart')).toBeInTheDocument()
     expect(
@@ -79,7 +134,10 @@ describe('Cart', () => {
   })
 
   it('renders cart items when there are items', () => {
-    render(<Cart items={mockItems} />)
+    // Ensure we have a proper array for any selectors that need it
+    mockUseAppSelector.mockImplementation(createSelectorMock(null))
+
+    render(<Cart items={mockCartItems} />)
 
     // This is a partial test as we're mocking CartItem component in real usage
     expect(
