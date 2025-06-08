@@ -111,15 +111,10 @@ export function ShippingAddressForm() {
   const router = useRouter()
   const dispatch = useDispatch()
 
-  // Get shipping address from the Redux store if available
   const shippingAddress = useAppSelector(selectShippingAddress)
   const savedAddressPreference = useAppSelector(selectSaveAddress)
 
-  // Handle form submission
   const handleSubmit = (data: ShippingAddressFormData) => {
-    console.log('Shipping address form data:', data)
-
-    // 1. Save the shipping address to the store
     dispatch(
       saveShippingAddress({
         address: {
@@ -136,11 +131,9 @@ export function ShippingAddressForm() {
       })
     )
 
-    // 2. Navigate to the next checkout step
     router.push('/checkout/payment')
   }
 
-  // Handle back button click
   const handleBack = () => {
     router.push('/checkout')
   }
@@ -172,7 +165,7 @@ export function ShippingAddressForm() {
           city: shippingAddress?.city || '',
           state: shippingAddress?.state || '',
           postalCode: shippingAddress?.zipCode || '',
-          country: shippingAddress?.country || 'US',
+          country: shippingAddress?.country || '',
           saveAddress: savedAddressPreference || true,
         }}
       />

@@ -39,6 +39,7 @@ function PaymentForm() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
   const previousStepInfo = useAppSelector(selectPreviousStep)
+  const [cardComplete, setCardComplete] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,11 +57,6 @@ function PaymentForm() {
         throw new Error('Card element not found')
       }
 
-      // In a real app, you would:
-      // 1. Send the card details to your server
-      // 2. Create a payment intent on your server with the Stripe API
-      // 3. Confirm the payment on the client side
-
       // For demo purposes, we'll just simulate a successful payment
       const { error } = await stripe.createPaymentMethod({
         type: 'card',
@@ -74,11 +70,6 @@ function PaymentForm() {
       // Simulate processing delay
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      // Set a cookie to indicate order completion - expires in 1 hour
-      // const expiryDate = new Date()
-      // expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000) // 1 hour
-      // document.cookie = `order_completed=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`
-
       // Complete the checkout in Redux
       dispatch(completeCheckout())
 
@@ -87,12 +78,8 @@ function PaymentForm() {
 
       // Navigate to confirmation page
       router.push('/checkout/confirmation')
-    } catch (error) {
-      if (error instanceof Error) {
-        setPaymentError(error.message)
-      } else {
-        setPaymentError('An unknown error occurred')
-      }
+    } catch (error: any) {
+      setPaymentError(error.message)
     } finally {
       setIsProcessing(false)
     }
@@ -137,6 +124,14 @@ function PaymentForm() {
                   },
                 },
               }}
+              onChange={(event) => {
+                setCardComplete(event.complete)
+                if (event.error) {
+                  setPaymentError(event.error.message)
+                } else {
+                  setPaymentError(null)
+                }
+              }}
             />
           </div>
 
@@ -148,7 +143,10 @@ function PaymentForm() {
         </div>
 
         <div className="pt-4 flex justify-end">
-          <Button type="submit" disabled={!stripe || isProcessing}>
+          <Button
+            type="submit"
+            disabled={!stripe || isProcessing || !cardComplete}
+          >
             {isProcessing ? 'Processing...' : 'Complete Order'}
           </Button>
         </div>

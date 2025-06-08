@@ -56,6 +56,7 @@ export function Steps({
 
     // Update Redux state
     dispatch(setCurrentStep(step.id))
+    console.log('step.id', step)
 
     // Navigate to the step's path if available
     if (step.path) {

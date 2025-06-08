@@ -23,14 +23,11 @@ export default function CheckoutLayout({ children }: { children: ReactNode }) {
   }, [dispatch])
 
   return (
-    <div className="container max-w-6xl mx-auto px-4  md:px-10 py-8">
+    <div className="container max-w-6xl mx-auto px-4 md:px-10 py-8">
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
 
       <div className="mb-12">
-        <Steps
-          steps={steps.map((s) => ({ id: s.id, name: s.name }))}
-          currentStep={stepIndex}
-        />
+        <Steps steps={steps} currentStep={stepIndex} />
       </div>
 
       {children}

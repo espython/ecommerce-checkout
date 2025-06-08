@@ -31,12 +31,12 @@ const eslintConfig = [
 
     // Basic rules
     rules: {
-      'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': 'warn',
       'no-console': 'warn',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       '@typescript-eslint/no-explicit-any': 'off',
+      'prettier/prettier': 'error',
     },
   },
 ]

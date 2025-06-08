@@ -71,7 +71,7 @@ export function Cart({
         </p>
         {!hideControls && (
           <Button asChild>
-            <Link href="/products">Continue Shopping</Link>
+            <Link href="/checkout">Continue Shopping</Link>
           </Button>
         )}
       </div>

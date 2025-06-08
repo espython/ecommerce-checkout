@@ -1,6 +1,6 @@
 'use client'
 
-import React, { JSX } from 'react'
+import React, { JSX, useMemo } from 'react'
 import {
   useForm,
   FormProvider,
@@ -84,7 +84,47 @@ export function FormGenerator<T extends FieldValues>({
   const methods = useForm<T>({
     defaultValues,
     resolver: validationSchema ? zodResolver(validationSchema) : undefined,
+    mode: 'onTouched', // Enable validation as fields are touched
   })
+
+  // Get form state to check validation status
+  const { formState } = methods
+
+  // Determine if the form is submittable (either no validation schema or form is valid)
+  const isSubmittable = useMemo(() => {
+    if (!validationSchema) return true
+
+    // Get current form values
+    const formValues = methods.getValues()
+
+    // Check if all required fields are properly filled
+    const requiredFieldsFilled = schema
+      .filter((field) => field.required)
+      .every((field) => {
+        const fieldName = field.name as keyof typeof formValues
+        const fieldValue = formValues[fieldName]
+        const fieldIsDirty =
+          !!formState.dirtyFields[
+            fieldName as keyof typeof formState.dirtyFields
+          ]
+
+        return (
+          fieldIsDirty ||
+          (fieldValue !== undefined &&
+            fieldValue !== null &&
+            fieldValue !== '' &&
+            (typeof fieldValue !== 'object' ||
+              Object.keys(fieldValue).length > 0))
+        )
+      })
+
+    // For the form to be submittable, it should be valid and have no errors
+    return (
+      (formState.isValid || !formState.isValidating) &&
+      Object.keys(formState.errors).length === 0 &&
+      requiredFieldsFilled
+    )
+  }, [formState, schema, validationSchema, methods])
 
   // Form submission handler
   const handleSubmit = methods.handleSubmit((data) => {
@@ -172,7 +212,7 @@ export function FormGenerator<T extends FieldValues>({
           )}
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !isSubmittable}
             className=" w-full md:w-min"
           >
             {isLoading ? 'Processing...' : submitText}
