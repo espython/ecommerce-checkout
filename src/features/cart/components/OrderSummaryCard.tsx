@@ -10,7 +10,7 @@ export function OrderSummaryCard() {
 
   return (
     <Card className="p-6 mb-6">
-      <h3 className="font-medium mb-3">Order Summary</h3>
+      <h3 className="text-lg font-medium mb-3">Order Summary</h3>
       <div className="divide-y">
         {cartItems.map((item) => (
           <CartItemCompact key={item.product.id} item={item} />

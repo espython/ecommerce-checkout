@@ -51,7 +51,7 @@ export function CartSummary({
     <div className={`bg-gray-50 rounded-lg p-6 ${className}`}>
       <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2 mb-4">
         <ShoppingBag className="h-5 w-5" />
-        Order Summary
+        Order Details
       </h2>
 
       <div className="space-y-4">

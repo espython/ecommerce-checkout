@@ -16,6 +16,7 @@ import { CheckoutPageSkeleton } from '@/features/checkout/components/checkout-sk
 import { clearCart } from '@/features/cart/store/cart-slice'
 import { OrderItemsList } from '@/features/checkout/components/order-items-list'
 import { selectCartItems } from '@/features/cart/store/cart-selectors'
+import { ConfirmationItems } from '@/features/confirmation/components/confirmation-items'
 
 export default function ConfirmationPage() {
   const router = useRouter()
@@ -33,11 +34,9 @@ export default function ConfirmationPage() {
     dispatch(completeCheckout())
   }, [dispatch])
 
-  // If cart is empty and not a recent order, redirect back to cart
   const { isValid } = useCheckoutGuard(4) // Step 3 - payment
 
   const cartItems = useAppSelector(selectCartItems)
-  // Set current step when landing on this page
   useEffect(() => {
     dispatch(setCurrentStep(4))
   }, [dispatch])
@@ -54,9 +53,7 @@ export default function ConfirmationPage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-
+    <div className="container max-w-6xl   py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Main confirmation area */}
         <div className="lg:col-span-2">
@@ -74,24 +71,10 @@ export default function ConfirmationPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex justify-between border-b pb-2">
-                <span className="font-medium">Order Number:</span>
-                <span>{orderNumber}</span>
-              </div>
-              <div className="flex justify-between border-b pb-2">
-                <span className="font-medium">Order Date:</span>
-                <span>{orderDate}</span>
-              </div>
-              <div className="flex justify-between border-b pb-2">
-                <span className="font-medium">Payment Status:</span>
-                <span className="text-green-600 font-medium">Paid</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Estimated Delivery:</span>
-                <span>3-5 business days</span>
-              </div>
-            </div>
+            <ConfirmationItems
+              orderNumber={orderNumber}
+              orderDate={orderDate}
+            />
 
             <div className="mt-8">
               <h3 className="text-lg font-medium mb-4">Order Details</h3>

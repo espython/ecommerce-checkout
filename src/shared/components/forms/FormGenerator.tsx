@@ -159,7 +159,7 @@ export function FormGenerator<T extends FieldValues>({
           })}
         </div>
 
-        <div className="flex items-center justify-end space-x-4 pt-2">
+        <div className="flex items-center  md:justify-end space-x-4 pt-2">
           {cancelText && onCancel && (
             <Button
               type="button"
@@ -170,7 +170,11 @@ export function FormGenerator<T extends FieldValues>({
               {cancelText}
             </Button>
           )}
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className=" w-full md:w-min"
+          >
             {isLoading ? 'Processing...' : submitText}
           </Button>
         </div>

@@ -18,8 +18,7 @@ import {
   useClearCartMutation,
   useValidateCartMutation,
 } from '../store/cart-api'
-import type { CartItem, Product } from '../types/cart.types'
-import { mockProducts } from '../utils/mock-cart-data'
+import type { Product } from '../types/cart.types'
 
 export const useCart = () => {
   const dispatch = useAppDispatch()
@@ -33,14 +32,14 @@ export const useCart = () => {
   )
 
   const removeItem = useCallback(
-    (productId: string) => {
+    (productId: number) => {
       dispatch(removeFromCart(productId))
     },
     [dispatch]
   )
 
   const updateItemQuantity = useCallback(
-    (productId: string, quantity: number) => {
+    (productId: number, quantity: number) => {
       dispatch(updateQuantity({ productId, quantity }))
     },
     [dispatch]
@@ -104,39 +103,6 @@ export const useCartApi = () => {
   }, [isFetching, isClearing, isValidating, fetchError, dispatch])
 
   // Update Redux store with data from API when it loads
-  const fetchAndSetCart = useCallback(async () => {
-    dispatch(setLoading(true))
-    try {
-      const result = await fetchCart().unwrap()
-      if (result) {
-        dispatch(setCartItems(result))
-        dispatch(setError(null))
-        return result
-      }
-    } catch (error) {
-      console.error('Failed to fetch cart:', error)
-
-      // Create mock cart items (2 products by default)
-      const mockCartItems: CartItem[] = mockProducts
-        .slice(0, 2)
-        .map((product) => ({
-          id: product.id,
-          product,
-          quantity: Math.floor(Math.random() * 2) + 1,
-          addedAt: new Date().toISOString(),
-        }))
-
-      // Populate the store with mock data
-      dispatch(setCartItems(mockCartItems))
-
-      // Set a warning instead of an error since we're recovering with mock data
-      dispatch(setError('Using sample cart data - failed to fetch from server'))
-
-      return mockCartItems
-    } finally {
-      dispatch(setLoading(false))
-    }
-  }, [fetchCart, dispatch])
 
   const clearCart = useCallback(async () => {
     try {
@@ -164,7 +130,6 @@ export const useCartApi = () => {
   const isLoading = isFetching || isClearing || isValidating
 
   return {
-    fetchCart: fetchAndSetCart,
     clearCart,
     validateCart,
     isLoading,

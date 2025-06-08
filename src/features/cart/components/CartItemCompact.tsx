@@ -12,7 +12,7 @@ export function CartItemCompact({ item }: CartItemCompactProps) {
 
   return (
     <div className="flex items-center gap-3 py-2">
-      <div className="relative w-16 h-16 rounded bg-gray-100 overflow-hidden">
+      <div className="relative w-16 h-16 rounded bg-gray-100 ">
         <Image
           src={product.image}
           alt={product.name}
@@ -21,7 +21,7 @@ export function CartItemCompact({ item }: CartItemCompactProps) {
         />
       </div>
 
-      <div className="flex-1">
+      <div className="max-w-[70%]">
         <p className="font-medium truncate">{product.name}</p>
         <div className="flex items-center text-sm text-gray-500">
           <span>Qty: {quantity}</span>

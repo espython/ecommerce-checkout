@@ -97,7 +97,7 @@ export function Steps({
                 >
                   <span
                     className={cn(
-                      'h-2.5 w-2.5 rounded-full',
+                      'h-5 w-5 rounded-full',
                       isCompleted || isCurrent ? 'bg-primary' : 'bg-transparent'
                     )}
                   >
@@ -107,7 +107,7 @@ export function Steps({
                         aria-hidden="true"
                       />
                     )}
-                    {!isCompleted && (
+                    {!isCompleted && !isCurrent && (
                       <span className="absolute inset-0 flex items-center justify-center">
                         <span className="text-sm font-medium text-gray-500">
                           {step.id}
@@ -129,7 +129,9 @@ export function Steps({
               </div>
 
               {/* Step text */}
-              <div className="absolute -bottom-8 left-0 w-full text-center">
+              <div
+                className={`absolute -bottom-12 md:-bottom-8 ${step.id === steps.length ? '-left-9' : 'left-0'} w-full text-start`}
+              >
                 <span
                   className={cn(
                     'text-sm font-medium',

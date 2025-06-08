@@ -88,7 +88,7 @@ export const cartSlice = createSlice({
       state.lastUpdated = new Date().toISOString()
     },
 
-    removeFromCart: (state, action: PayloadAction<string>) => {
+    removeFromCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter(
         (item) => item.product.id !== action.payload
       )
@@ -101,7 +101,7 @@ export const cartSlice = createSlice({
 
     updateQuantity: (
       state,
-      action: PayloadAction<{ productId: string; quantity: number }>
+      action: PayloadAction<{ productId: number; quantity: number }>
     ) => {
       const { productId, quantity } = action.payload
       const item = state.items.find((item) => item.product.id === productId)

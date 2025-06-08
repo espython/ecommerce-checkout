@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2 } from 'lucide-react'
 import { CartItem as CartItemType } from '../types/cart.types'
 import { useCart } from '../hooks/use-cart'
 import { formatCurrency } from '@/utils/format'
+import { Button } from '@/components/ui'
 
 interface CartItemProps {
   item: CartItemType
@@ -33,7 +34,7 @@ export function CartItem({ item }: CartItemProps) {
   const itemTotal = product.price * quantity
 
   return (
-    <div className="flex items-center space-x-4 py-4 border-b last:border-b-0">
+    <div className="flex  space-y-4 justify-center  items-center space-x-4 py-4 border-b last:border-b-0">
       {/* Product Image */}
       <div className="relative h-24 w-24 overflow-hidden rounded-md border bg-gray-100">
         <Image
@@ -46,7 +47,7 @@ export function CartItem({ item }: CartItemProps) {
       </div>
 
       {/* Product Details */}
-      <div className="flex-1 space-y-1">
+      <div className="flex-1">
         <h3 className="font-medium text-gray-900">{product.name}</h3>
 
         {item.selectedVariant && (
@@ -59,40 +60,43 @@ export function CartItem({ item }: CartItemProps) {
             )}
           </div>
         )}
+        {/* Quantity Controls */}
+        <div className="flex items-center space-x-3 py-1">
+          <Button
+            onClick={handleDecreaseQuantity}
+            size={'icon'}
+            variant={'ghost'}
+            className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
+          >
+            <Minus className="h-4 w-4" />
+          </Button>
 
-        <div className="text-sm font-medium">
+          <span className="w-6 text-center">{quantity}</span>
+
+          <Button
+            onClick={handleIncreaseQuantity}
+            size={'icon'}
+            variant={'ghost'}
+            className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+          {/* Item Total & Remove */}
+          <div className="flex flex-1 items-center justify-end space-y-2">
+            {/*<div className="font-medium">{formatCurrency(itemTotal)}</div>*/}
+            <Button
+              onClick={handleRemove}
+              size={'icon'}
+              variant={'ghost'}
+              className="text-red-500 hover:text-red-600 rounded-full"
+            >
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+        <div className="text-lg font-medium">
           {formatCurrency(product.price)}
         </div>
-      </div>
-
-      {/* Quantity Controls */}
-      <div className="flex items-center space-x-3">
-        <button
-          onClick={handleDecreaseQuantity}
-          className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
-        >
-          <Minus className="h-4 w-4" />
-        </button>
-
-        <span className="w-6 text-center">{quantity}</span>
-
-        <button
-          onClick={handleIncreaseQuantity}
-          className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
-        >
-          <Plus className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Item Total & Remove */}
-      <div className="flex flex-col items-end space-y-2">
-        <div className="font-medium">{formatCurrency(itemTotal)}</div>
-        <button
-          onClick={handleRemove}
-          className="text-red-500 hover:text-red-600"
-        >
-          <Trash2 className="h-5 w-5" />
-        </button>
       </div>
     </div>
   )

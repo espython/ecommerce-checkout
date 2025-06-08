@@ -6,7 +6,7 @@ import { CartItem } from '../types/cart.types'
 import { CartSkeleton } from './CartSkeleton'
 import { Suspense, useEffect } from 'react'
 import { setCurrentStep } from '@/features/checkout/store/checkout-slice'
-import { useAppDispatch } from '@/shared/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { setCartItems } from '../store/cart-slice'
 
 interface CartContainerProps {
@@ -24,11 +24,11 @@ export function CartContainer({
     dispatch(setCartItems(items))
   }, [dispatch, items])
 
+  const cartItems = useAppSelector((state) => state.cart.items)
+
   return (
     <Suspense fallback={<CartSkeleton />}>
-      <Card className="p-6 mb-6">
-        <Cart items={items} isLoading={isLoading} />
-      </Card>
+      <Cart items={cartItems} isLoading={isLoading} />
     </Suspense>
   )
 }

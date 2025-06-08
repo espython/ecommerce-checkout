@@ -16,6 +16,7 @@ import {
   AlertDescription,
 } from '@/shared/components/ui/alert'
 import { OrderSummarySidebar } from './OrderSummarySidebar'
+import { Card } from '@/components/ui'
 
 interface CartProps {
   items: CartItemType[]
@@ -80,13 +81,13 @@ export function Cart({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Cart items */}
-      <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
+      <Card className="lg:col-span-2  shadow p-6">
         <div className="divide-y">
           {items.map((item) => (
             <CartItem key={item.id} item={item} />
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* Order summary */}
       <OrderSummarySidebar />
