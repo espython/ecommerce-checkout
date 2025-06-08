@@ -102,7 +102,7 @@ const shippingFormSchema: FormFieldSchema[] = [
 ]
 
 // Generate Zod validation schema from the form schema
-const validationSchema = generateValidationSchema(shippingFormSchema)
+export const validationSchema = generateValidationSchema(shippingFormSchema)
 
 // Define the shipping address data type
 export type ShippingAddressFormData = z.infer<typeof validationSchema>
