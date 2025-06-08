@@ -11,7 +11,10 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
-    "debug": "next dev"
+    "debug": "next dev",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -55,6 +58,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/google.maps": "^3.58.1",
+    "@types/jest": "^29.5.14",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.17.57",
     "@types/react": "^19",

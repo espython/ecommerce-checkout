@@ -41,7 +41,7 @@ export const applyCoupon = createAsyncThunk(
   }
 )
 
-const initialState: CartState = {
+export const initialState: CartState = {
   items: [],
   subtotal: 0,
   totalItems: 0,
@@ -198,3 +198,5 @@ export const {
   setLoading,
   setError,
 } = cartSlice.actions
+
+export default cartSlice.reducer
