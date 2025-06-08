@@ -10,17 +10,8 @@ import {
   useElements,
 } from '@stripe/react-stripe-js'
 import { Button } from '@/shared/components/ui/button'
-import { Card } from '@/shared/components/ui/card'
 import { BackButton } from '@/shared/components/ui/back-button'
-import { useAppSelector, useAppDispatch } from '@/shared/hooks/redux'
-import {
-  selectCartItems,
-  selectIsCartEmpty,
-  selectCartTotal,
-} from '@/features/cart/store/cart-selectors'
-import { CartSummary } from '@/features/cart/components/CartSummary'
-import { CartItemCompact } from '@/features/cart/components/CartItemCompact'
-import { Steps } from '@/shared/components/ui/steps'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { CreditCard } from 'lucide-react'
 import {
   setCurrentStep,
@@ -28,8 +19,11 @@ import {
   prevStep,
   completeCheckout,
   selectPreviousStep,
-  selectNextStep,
 } from '@/features/checkout/store/checkout-slice'
+import { useCheckoutGuard } from '@/features/checkout/hooks/use-checkout-guard'
+import { CheckoutPageSkeleton } from '@/features/checkout/components/checkout-skeleton'
+import { OrderSummarySidebar } from '@/features/cart/components/OrderSummarySidebar'
+import { Card } from '@/shared/components/ui'
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(
@@ -44,7 +38,6 @@ function PaymentForm() {
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentError, setPaymentError] = useState<string | null>(null)
-  const nextStepInfo = useAppSelector(selectNextStep)
   const previousStepInfo = useAppSelector(selectPreviousStep)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,9 +75,9 @@ function PaymentForm() {
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
       // Set a cookie to indicate order completion - expires in 1 hour
-      const expiryDate = new Date()
-      expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000) // 1 hour
-      document.cookie = `order_completed=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`
+      // const expiryDate = new Date()
+      // expiryDate.setTime(expiryDate.getTime() + 60 * 60 * 1000) // 1 hour
+      // document.cookie = `order_completed=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`
 
       // Complete the checkout in Redux
       dispatch(completeCheckout())
@@ -165,48 +158,23 @@ function PaymentForm() {
 }
 
 export default function PaymentPage() {
-  const router = useRouter()
   const dispatch = useAppDispatch()
-  const cartItems = useAppSelector(selectCartItems)
-  const isEmpty = useAppSelector(selectIsCartEmpty)
-  const cartTotal = useAppSelector(selectCartTotal)
-  const [isLoading, setIsLoading] = useState(true)
 
   // Set current step when landing on this page
   useEffect(() => {
     dispatch(setCurrentStep(3))
   }, [dispatch])
 
+  const { isValid } = useCheckoutGuard(3) // Step 3 - payment
+
+  // Set current step when landing on this page
   useEffect(() => {
-    // If cart is empty, redirect back to cart
-    if (isEmpty) {
-      router.push('/checkout')
-      return
-    }
+    dispatch(setCurrentStep(3))
+  }, [dispatch])
 
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [isEmpty, router])
-
-  // Return early if loading
-  if (isLoading) {
-    return (
-      <div className="container max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-
-        <div className="mb-12">
-          <Steps />
-        </div>
-
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-pulse">Loading payment form...</div>
-        </div>
-      </div>
-    )
+  // Show loading or placeholder while redirecting if needed
+  if (!isValid) {
+    return <CheckoutPageSkeleton />
   }
 
   // Stripe Elements appearance options
@@ -238,18 +206,7 @@ export default function PaymentPage() {
         </div>
 
         {/* Order summary sidebar */}
-        <div className="lg:col-span-1">
-          <Card className="p-6 mb-6">
-            <h3 className="font-medium mb-3">Order Summary</h3>
-            <div className="divide-y">
-              {cartItems.map((item) => (
-                <CartItemCompact key={item.product.id} item={item} />
-              ))}
-            </div>
-          </Card>
-
-          <CartSummary />
-        </div>
+        <OrderSummarySidebar />
       </div>
     </div>
   )

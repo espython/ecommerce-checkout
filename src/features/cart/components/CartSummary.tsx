@@ -25,13 +25,15 @@ interface CartSummaryProps {
 
 export function CartSummary({
   className = '',
-  showCheckoutButton = true,
+  showCheckoutButton: propShowCheckoutButton = true,
 }: CartSummaryProps) {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const nextStepData = useAppSelector(selectNextStep)
   const pathname = usePathname()
-  showCheckoutButton = pathname === '/checkout'
+  // Instead of overriding the prop directly, create a local variable
+  const isCheckoutPage = pathname === '/checkout'
+  const showCheckoutButton = isCheckoutPage && propShowCheckoutButton
   // Get cart totals from the store
   const subtotal = useAppSelector(selectSubtotal)
   const shipping = useAppSelector(selectShipping)

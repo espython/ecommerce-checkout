@@ -1,5 +1,5 @@
 import { apiSlice } from '@/shared/store/api-slice'
-import type { CartItem, Product, ValidatedCartItem } from '../types/cart.types'
+import type { CartItem, ValidatedCartItem } from '../types/cart.types'
 
 // Response type for validateCartItems
 interface ValidateCartResponse {
@@ -37,9 +37,9 @@ const transformFakeStoreProducts = (
   products: FakeStoreProduct[]
 ): CartItem[] => {
   return products.map((item) => ({
-    id: item.id.toString(),
+    id: item.id,
     product: {
-      id: item.id.toString(),
+      id: item.id,
       name: item.title,
       price: item.price,
       image: item.image,

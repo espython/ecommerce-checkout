@@ -1,10 +1,11 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAppSelector } from '@/shared/hooks/redux'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { selectCurrentStep } from '@/features/checkout/store/checkout-slice'
 import { Steps } from '@/shared/components/ui/steps'
+import { useEffect } from 'react'
+import { resetCheckout } from '@/features/checkout/store/checkout-slice'
 
 const steps = [
   { id: 1, name: 'Cart Review', path: '/checkout' },
@@ -14,8 +15,22 @@ const steps = [
 ]
 
 export default function CheckoutLayout({ children }: { children: ReactNode }) {
+  const dispatch = useAppDispatch()
   const currentStep = useAppSelector(selectCurrentStep)
   const stepIndex = steps.findIndex((step) => step.id === currentStep?.id) + 1
+
+  // In your checkout layout or main component
+  useEffect(() => {
+    // Only run this cleanup effect when unmounting the entire checkout flow
+    return () => {
+      // Clean up checkout state when navigating away from checkout flow
+      if (typeof window !== 'undefined') {
+        // Only access localStorage on the client
+        localStorage.removeItem('checkout_step')
+      }
+      dispatch(resetCheckout())
+    }
+  }, [dispatch])
 
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">

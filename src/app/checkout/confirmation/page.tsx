@@ -4,26 +4,22 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
-import { useAppSelector, useAppDispatch } from '@/shared/hooks/redux'
-import {
-  selectCartItems,
-  selectIsCartEmpty,
-} from '@/features/cart/store/cart-selectors'
-import { clearCart } from '@/features/cart/store/cart-slice'
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { CheckCircle } from 'lucide-react'
 import {
   setCurrentStep,
   resetCheckout,
   completeCheckout,
-  selectIsCheckoutComplete,
 } from '@/features/checkout/store/checkout-slice'
+import { useCheckoutGuard } from '@/features/checkout/hooks/use-checkout-guard'
+import { CheckoutPageSkeleton } from '@/features/checkout/components/checkout-skeleton'
+import { clearCart } from '@/features/cart/store/cart-slice'
+import { OrderItemsList } from '@/features/checkout/components/order-items-list'
+import { selectCartItems } from '@/features/cart/store/cart-selectors'
 
 export default function ConfirmationPage() {
   const router = useRouter()
-  const cartItems = useAppSelector(selectCartItems)
-  const isEmpty = useAppSelector(selectIsCartEmpty)
   const dispatch = useAppDispatch()
-  const isCheckoutComplete = useAppSelector(selectIsCheckoutComplete)
   const orderNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`
   const orderDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -38,23 +34,18 @@ export default function ConfirmationPage() {
   }, [dispatch])
 
   // If cart is empty and not a recent order, redirect back to cart
+  const { isValid } = useCheckoutGuard(4) // Step 3 - payment
+
+  const cartItems = useAppSelector(selectCartItems)
+  // Set current step when landing on this page
   useEffect(() => {
-    if (isEmpty && !isCheckoutComplete) {
-      router.push('/checkout')
-    }
+    dispatch(setCurrentStep(4))
+  }, [dispatch])
 
-    // Prevent going back with browser history
-    history.pushState(null, '', window.location.href)
-    window.addEventListener('popstate', () => {
-      history.pushState(null, '', window.location.href)
-    })
-
-    return () => {
-      window.removeEventListener('popstate', () => {
-        history.pushState(null, '', window.location.href)
-      })
-    }
-  }, [isEmpty, router, isCheckoutComplete])
+  // Show loading or placeholder while redirecting if needed
+  if (!isValid) {
+    return <CheckoutPageSkeleton />
+  }
 
   const handleContinueShopping = () => {
     dispatch(clearCart())
@@ -109,24 +100,7 @@ export default function ConfirmationPage() {
                   <span>Item</span>
                   <span>Total</span>
                 </div>
-                <div className="divide-y">
-                  {cartItems.map((item) => (
-                    <div
-                      key={item.product.id}
-                      className="p-4 flex justify-between"
-                    >
-                      <div>
-                        <p className="font-medium">{item.product.name}</p>
-                        <p className="text-sm text-gray-500">
-                          Quantity: {item.quantity}
-                        </p>
-                      </div>
-                      <span>
-                        ${(item.product.price * item.quantity).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <OrderItemsList items={cartItems} />
               </div>
             </div>
 

@@ -75,6 +75,7 @@ export const cartSlice = createSlice({
         existingItem.quantity += quantity
       } else {
         state.items.push({
+          id: product.id,
           product,
           quantity,
           addedAt: new Date().toISOString(),

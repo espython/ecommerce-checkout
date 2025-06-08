@@ -1,24 +1,26 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { Card } from '@/shared/components/ui/card'
-import { useAppSelector } from '@/shared/hooks/redux'
-import { selectIsCartEmpty } from '@/features/cart/store/cart-selectors'
-import { Steps } from '@/shared/components/ui/steps'
+import { useAppDispatch } from '@/shared/hooks/redux'
 import { ShippingAddressForm } from '@/features/shipping/components/ShippingAddressForm'
 import { OrderSummarySidebar } from '@/features/cart/components/OrderSummarySidebar'
+import { useCheckoutGuard } from '@/features/checkout/hooks/use-checkout-guard'
+import { useEffect } from 'react'
+import { setCurrentStep } from '@/features/checkout/store/checkout-slice'
+import { CheckoutPageSkeleton } from '@/features/checkout/components/checkout-skeleton'
 
 export default function ShippingPage() {
-  const router = useRouter()
-  const isEmpty = useAppSelector(selectIsCartEmpty)
+  const dispatch = useAppDispatch()
+  const { isValid } = useCheckoutGuard(2) // Step 2 - shipping
 
-  // If cart is empty, redirect back to cart
-  if (isEmpty) {
-    router.push('/checkout')
-  }
+  // Set current step when landing on this page
+  useEffect(() => {
+    dispatch(setCurrentStep(2))
+  }, [dispatch])
 
-  const handleBack = () => {
-    router.push('/checkout')
+  // Show loading or placeholder while redirecting if needed
+  if (!isValid) {
+    return <CheckoutPageSkeleton />
   }
 
   return (

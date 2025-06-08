@@ -140,4 +140,21 @@ export const selectPreviousStep = (state: RootState) => {
   return null
 }
 
+// src/features/checkout/store/checkout-slice.ts
+// Add to your initialization logic or create a middleware
+
+// Load persisted state on app boot
+const persistedStep =
+  typeof window !== 'undefined' ? localStorage.getItem('checkout_step') : null
+const initialStep = persistedStep ? parseInt(persistedStep, 10) : 1
+
+// Update localStorage when step changes
+export const setCurrentStepWithPersistence =
+  (step: number) => (dispatch: any) => {
+    dispatch(setCurrentStep(step))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('checkout_step', step.toString())
+    }
+  }
+
 export default checkoutSlice.reducer

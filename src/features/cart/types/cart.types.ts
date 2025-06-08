@@ -1,5 +1,5 @@
 export interface Product {
-  id: string
+  id: number
   name: string
   price: number
   image: string
@@ -15,12 +15,12 @@ export interface Product {
 }
 
 export interface ValidatedCartItem {
-  id: string
+  id: number
   availableQuantity: number
 }
 
 export interface CartItem {
-  id: string
+  id: number
   product: Product
   quantity: number
   selectedVariant?: {
