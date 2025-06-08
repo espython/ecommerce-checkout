@@ -1,11 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
-import { CartItem } from '../CartItem'
-import { useCart } from '../../hooks/use-cart'
+import { CartItem } from '../components'
+import { useCart } from '../hooks/use-cart'
 import { mockCartItems } from '@/test-utils/test-data'
 
 // Mock the useCart hook
-jest.mock('../../hooks/use-cart')
+jest.mock('../hooks/use-cart')
 const mockUseCart = jest.mocked(useCart)
 
 describe('CartItem', () => {

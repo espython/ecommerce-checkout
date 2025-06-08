@@ -1,14 +1,14 @@
 import { screen, fireEvent } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
-import { Cart } from '../Cart'
+import { Cart } from '@/features/cart/components/Cart'
 import { useAppSelector } from '@/shared/hooks/redux'
-import { useCartApi, useCart } from '../../hooks/use-cart'
+import { useCartApi, useCart } from '../hooks/use-cart'
 import { mockCartItems } from '@/test-utils/test-data'
-import { selectCartItems, selectCartStatus } from '../../store/cart-selectors'
+import { selectCartStatus } from '../store/cart-selectors'
 
 // Mock the hooks
 jest.mock('@/shared/hooks/redux')
-jest.mock('../../hooks/use-cart', () => ({
+jest.mock('../hooks/use-cart', () => ({
   useCartApi: jest.fn(),
   useCart: jest.fn(),
 }))

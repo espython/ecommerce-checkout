@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
-import { CartContainer } from '../CartContainer'
-import { CartItem } from '../../types/cart.types'
+import { CartContainer } from '../components'
+import { CartItem } from '../types/cart.types'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import { setCurrentStep } from '@/features/checkout/store/checkout-slice'
 import {

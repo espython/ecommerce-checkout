@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
-import { OrderSummarySidebar } from '../OrderSummarySidebar'
+import { OrderSummarySidebar } from '../components'
 import { usePathname } from 'next/navigation'
 
 // Mock the Next.js hook
@@ -12,11 +12,11 @@ jest.mock('next/navigation', () => ({
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>
 
 // Mock child components
-jest.mock('../CartSummary', () => ({
+jest.mock('../components/CartSummary', () => ({
   CartSummary: () => <div data-testid="cart-summary">Cart Summary</div>,
 }))
 
-jest.mock('../OrderSummaryCard', () => ({
+jest.mock('../components/OrderSummaryCard', () => ({
   OrderSummaryCard: () => (
     <div data-testid="order-summary-card">Order Summary Card</div>
   ),
