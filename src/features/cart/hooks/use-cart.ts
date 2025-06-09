@@ -9,7 +9,6 @@ import {
   validateCartItems,
   applyCoupon,
   removeCoupon,
-  setCartItems,
   setLoading,
   setError,
 } from '../store/cart-slice'
