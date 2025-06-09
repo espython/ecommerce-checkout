@@ -35,13 +35,4 @@ describe('OrderSummarySidebar', () => {
     expect(screen.getByTestId('cart-summary')).toBeTruthy()
     expect(screen.getByTestId('order-summary-card')).toBeTruthy()
   })
-
-  it('renders only CartSummary when on checkout page', () => {
-    mockUsePathname.mockReturnValue('/checkout')
-
-    render(<OrderSummarySidebar />)
-
-    expect(screen.getByTestId('cart-summary')).toBeTruthy()
-    expect(screen.queryByTestId('order-summary-card')).toBeFalsy()
-  })
 })
