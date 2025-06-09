@@ -2,12 +2,13 @@ import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
-import { AppStore, RootState } from '@/shared/store'
-import cartSlice, {
+import { AppStore } from '@/shared/store'
+import {
+  cartSlice,
   initialState as cartInitialState,
 } from '@/features/cart/store/cart-slice'
-import shippingSlice from '@/features/shipping/store/shipping-slice'
-import checkoutSlice from '@/features/checkout/store/checkout-slice'
+import { shippingSlice } from '@/features/shipping/store/shipping-slice'
+import { checkoutSlice } from '@/features/checkout/store/checkout-slice'
 import { apiSlice } from '@/shared/store/api-slice'
 
 // Create a custom render function that includes Redux provider
@@ -18,13 +19,15 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
 
 // Create a test store with proper initial state
 function createTestStore(preloadedState: Partial<RootState> = {}) {
+  const rootReducer = {
+    [apiSlice.reducerPath]: apiSlice.reducer,
+    cart: cartSlice.reducer,
+    shipping: shippingSlice.reducer,
+    checkout: checkoutSlice.reducer,
+  }
+
   return configureStore({
-    reducer: {
-      api: apiSlice.reducer,
-      cart: cartSlice,
-      shipping: shippingSlice,
-      checkout: checkoutSlice,
-    },
+    reducer: rootReducer as any,
     preloadedState: {
       cart: cartInitialState,
       shipping: { address: null, saveAddress: false },
@@ -80,6 +83,14 @@ export function renderWithProviders(
   }
 
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) }
+}
+
+// Make sure your AppStore definition includes the API slice
+export type RootState = {
+  [apiSlice.reducerPath]: ReturnType<typeof apiSlice.reducer>
+  cart: ReturnType<typeof cartSlice.reducer>
+  shipping: ReturnType<typeof shippingSlice.reducer>
+  checkout: ReturnType<typeof checkoutSlice.reducer>
 }
 
 // Export everything from React Testing Library

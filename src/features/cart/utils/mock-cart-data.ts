@@ -5,7 +5,7 @@ import { makeStore } from '@/shared/store/index'
 // Sample product data
 export const mockProducts: Product[] = [
   {
-    id: 'p1',
+    id: 1,
     name: 'Premium Wireless Headphones',
     price: 199.99,
     image: '/images/products/headphones.jpg',
@@ -20,7 +20,7 @@ export const mockProducts: Product[] = [
     },
   },
   {
-    id: 'p2',
+    id: 2,
     name: 'Organic Cotton T-Shirt',
     price: 29.99,
     image: '/images/products/tshirt.jpg',
@@ -35,7 +35,7 @@ export const mockProducts: Product[] = [
     },
   },
   {
-    id: 'p3',
+    id: 3,
     name: 'Smart Home Hub',
     price: 129.99,
     image: '/images/products/smarthub.jpg',
@@ -76,7 +76,7 @@ export const populateCartWithMockData = (productCount: number = 2) => {
  * @returns boolean - Whether the product was found and added
  */
 export const addSpecificProductToCart = (
-  productId: string,
+  productId: number,
   quantity: number = 1
 ): boolean => {
   const product = mockProducts.find((p) => p.id === productId)
