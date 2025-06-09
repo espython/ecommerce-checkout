@@ -2,6 +2,48 @@
 
 A modern, feature-rich ecommerce checkout flow built with Next.js 15, Redux, TypeScript, and Tailwind CSS.
 
+## Quick Start
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/espython/ecommerce-checkout.git
+   cd ecommerce-checkout
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**  
+   Create a `.env.local` file with the following (replace with your actual values):
+   ```
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+   STRIPE_SECRET_KEY=sk_test_your_key
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser:**  
+   Go to [http://localhost:3000](http://localhost:3000)
+
+**To build and run for production:**
+
+6. **Build the app:**
+   ```bash
+   npm run build
+   ```
+
+7. **Start the production server:**
+   ```bash
+   npm start
+   ```
+
+
+
 ## Architecture Overview
 
 ### Folder Structure
