@@ -17,6 +17,7 @@ import {
 } from '@/shared/components/ui/alert'
 import { OrderSummarySidebar } from './OrderSummarySidebar'
 import { Card } from '@/components/ui'
+import { OrderSummaryCard } from './OrderSummaryCard'
 
 interface CartProps {
   items: CartItemType[]
