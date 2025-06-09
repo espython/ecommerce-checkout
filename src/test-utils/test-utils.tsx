@@ -3,12 +3,11 @@ import { render, RenderOptions } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { AppStore } from '@/shared/store'
-import {
-  cartSlice,
+import cartSlice, {
   initialState as cartInitialState,
 } from '@/features/cart/store/cart-slice'
-import { shippingSlice } from '@/features/shipping/store/shipping-slice'
-import { checkoutSlice } from '@/features/checkout/store/checkout-slice'
+import shippingSlice from '@/features/shipping/store/shipping-slice'
+import checkoutSlice from '@/features/checkout/store/checkout-slice'
 import { apiSlice } from '@/shared/store/api-slice'
 
 // Create a custom render function that includes Redux provider
@@ -21,9 +20,9 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
 function createTestStore(preloadedState: Partial<RootState> = {}) {
   const rootReducer = {
     [apiSlice.reducerPath]: apiSlice.reducer,
-    cart: cartSlice.reducer,
-    shipping: shippingSlice.reducer,
-    checkout: checkoutSlice.reducer,
+    cart: cartSlice,
+    shipping: shippingSlice,
+    checkout: checkoutSlice,
   }
 
   return configureStore({
@@ -88,9 +87,9 @@ export function renderWithProviders(
 // Make sure your AppStore definition includes the API slice
 export type RootState = {
   [apiSlice.reducerPath]: ReturnType<typeof apiSlice.reducer>
-  cart: ReturnType<typeof cartSlice.reducer>
-  shipping: ReturnType<typeof shippingSlice.reducer>
-  checkout: ReturnType<typeof checkoutSlice.reducer>
+  cart: ReturnType<typeof cartSlice>
+  shipping: ReturnType<typeof shippingSlice>
+  checkout: ReturnType<typeof checkoutSlice>
 }
 
 // Export everything from React Testing Library
