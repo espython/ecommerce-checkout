@@ -8,7 +8,6 @@ import cartSlice, {
 } from '@/features/cart/store/cart-slice'
 import shippingSlice from '@/features/shipping/store/shipping-slice'
 import checkoutSlice from '@/features/checkout/store/checkout-slice'
-import { apiSlice } from '@/shared/store/api-slice'
 
 // Create a custom render function that includes Redux provider
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
@@ -19,7 +18,6 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
 // Create a test store with proper initial state
 function createTestStore(preloadedState: Partial<RootState> = {}) {
   const rootReducer = {
-    [apiSlice.reducerPath]: apiSlice.reducer,
     cart: cartSlice,
     shipping: shippingSlice,
     checkout: checkoutSlice,
@@ -57,12 +55,6 @@ function createTestStore(preloadedState: Partial<RootState> = {}) {
       },
       ...preloadedState,
     },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [apiSlice.util.resetApiState.type],
-        },
-      }).concat(apiSlice.middleware),
   })
 }
 
@@ -86,7 +78,6 @@ export function renderWithProviders(
 
 // Make sure your AppStore definition includes the API slice
 export type RootState = {
-  [apiSlice.reducerPath]: ReturnType<typeof apiSlice.reducer>
   cart: ReturnType<typeof cartSlice>
   shipping: ReturnType<typeof shippingSlice>
   checkout: ReturnType<typeof checkoutSlice>

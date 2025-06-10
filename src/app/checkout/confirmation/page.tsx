@@ -17,10 +17,13 @@ import { clearCart } from '@/features/cart/store/cart-slice'
 import { OrderItemsList } from '@/features/checkout/components/order-items-list'
 import { selectCartItems } from '@/features/cart/store/cart-selectors'
 import { ConfirmationItems } from '@/features/confirmation/components/confirmation-items'
+import { clearShippingData } from '@/features/shipping/store/shipping-slice'
 
 export default function ConfirmationPage() {
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const { isValid } = useCheckoutGuard(4) // Step 3 - payment
+  const cartItems = useAppSelector(selectCartItems)
   const orderNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`
   const orderDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -34,13 +37,6 @@ export default function ConfirmationPage() {
     dispatch(completeCheckout())
   }, [dispatch])
 
-  const { isValid } = useCheckoutGuard(4) // Step 3 - payment
-
-  const cartItems = useAppSelector(selectCartItems)
-  useEffect(() => {
-    dispatch(setCurrentStep(4))
-  }, [dispatch])
-
   // Show loading or placeholder while redirecting if needed
   if (!isValid) {
     return <CheckoutPageSkeleton />
@@ -48,6 +44,7 @@ export default function ConfirmationPage() {
 
   const handleContinueShopping = () => {
     dispatch(clearCart())
+    dispatch(clearShippingData())
     dispatch(resetCheckout())
     router.push('/checkout')
   }

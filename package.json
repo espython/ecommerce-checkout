@@ -63,6 +63,7 @@
     "@types/node": "^20.17.57",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/redux-logger": "^3.0.13",
     "@typescript-eslint/eslint-plugin": "^8.33.1",
     "@typescript-eslint/parser": "^8.33.1",
     "eslint": "^9",
@@ -78,6 +79,7 @@
     "jest-environment-jsdom": "^30.0.0-beta.3",
     "lint-staged": "^16.1.0",
     "prettier": "^3.5.3",
+    "redux-logger": "^3.0.6",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"

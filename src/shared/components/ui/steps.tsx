@@ -56,7 +56,6 @@ export function Steps({
 
     // Update Redux state
     dispatch(setCurrentStep(step.id))
-    console.log('step.id', step)
 
     // Navigate to the step's path if available
     if (step.path) {
@@ -64,15 +63,108 @@ export function Steps({
     }
   }
 
+  // Extract function to determine step status
+  const getStepStatus = (step: Step, index: number) => {
+    return {
+      isCompleted: step.completed || currentStep > step.id,
+      isCurrent: currentStep === step.id,
+      isLast: index === steps.length - 1,
+      isClickable:
+        allowNavigation && (step.completed || step.id <= currentStep),
+    }
+  }
+
+  // Step indicator circle with number or check icon
+  const StepIndicator = ({
+    isCompleted,
+    isCurrent,
+    stepId,
+  }: {
+    isCompleted: boolean
+    isCurrent: boolean
+    stepId: number
+  }) => (
+    <div
+      className={cn(
+        'relative flex h-10 w-10 items-center justify-center rounded-full',
+        isCompleted
+          ? 'bg-primary'
+          : isCurrent
+            ? 'bg-primary/20 border-2 border-primary'
+            : 'bg-gray-100 border-2 border-gray-300'
+      )}
+    >
+      <span
+        className={cn(
+          'h-5 w-5 rounded-full',
+          isCompleted || isCurrent ? 'bg-primary' : 'bg-transparent'
+        )}
+      >
+        {isCompleted && (
+          <Check className="h-5 w-5 text-white" aria-hidden="true" />
+        )}
+        {!isCompleted && !isCurrent && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="text-sm font-medium text-gray-500">{stepId}</span>
+          </span>
+        )}
+      </span>
+    </div>
+  )
+
+  // Connector line between steps
+  const StepConnector = ({ isCompleted }: { isCompleted: boolean }) => (
+    <div
+      className={cn(
+        'flex-1 h-0.5 mx-2',
+        isCompleted ? 'bg-primary' : 'bg-gray-300'
+      )}
+    />
+  )
+
+  // Step label text
+  const StepLabel = ({
+    name,
+    isCurrent,
+    isCompleted,
+    isClickable,
+    stepId,
+    totalSteps,
+  }: {
+    name: string
+    isCurrent: boolean
+    isCompleted: boolean
+    isClickable: boolean
+    stepId: number
+    totalSteps: number
+  }) => (
+    <div
+      className={`absolute -bottom-12 md:-bottom-8 ${stepId === totalSteps ? '-left-9' : 'left-0'} w-full text-start`}
+    >
+      <span
+        className={cn(
+          'text-sm font-medium',
+          isCurrent
+            ? 'text-primary font-semibold'
+            : isCompleted
+              ? 'text-gray-900'
+              : 'text-gray-500',
+          isClickable && 'hover:text-primary transition-colors'
+        )}
+      >
+        {name}
+      </span>
+    </div>
+  )
+
   return (
     <nav aria-label="Progress" className={cn('w-full', className)}>
       <ol role="list" className="flex items-center">
         {steps.map((step, index) => {
-          const isCompleted = step.completed || currentStep > step.id
-          const isCurrent = currentStep === step.id
-          const isLast = index === steps.length - 1
-          const isClickable =
-            allowNavigation && (isCompleted || step.id <= currentStep)
+          const { isCompleted, isCurrent, isLast, isClickable } = getStepStatus(
+            step,
+            index
+          )
 
           return (
             <li
@@ -85,68 +177,24 @@ export function Steps({
               onClick={() => isClickable && handleStepClick(step)}
             >
               <div className="flex items-center">
-                {/* Complete or current step */}
-                <div
-                  className={cn(
-                    'relative flex h-10 w-10 items-center justify-center rounded-full',
-                    isCompleted
-                      ? 'bg-primary'
-                      : isCurrent
-                        ? 'bg-primary/20 border-2 border-primary'
-                        : 'bg-gray-100 border-2 border-gray-300'
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'h-5 w-5 rounded-full',
-                      isCompleted || isCurrent ? 'bg-primary' : 'bg-transparent'
-                    )}
-                  >
-                    {isCompleted && (
-                      <Check
-                        className="h-5 w-5 text-white"
-                        aria-hidden="true"
-                      />
-                    )}
-                    {!isCompleted && !isCurrent && (
-                      <span className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-medium text-gray-500">
-                          {step.id}
-                        </span>
-                      </span>
-                    )}
-                  </span>
-                </div>
+                <StepIndicator
+                  isCompleted={isCompleted}
+                  isCurrent={isCurrent}
+                  stepId={step.id}
+                />
 
                 {/* Lines connecting steps */}
-                {!isLast && (
-                  <div
-                    className={cn(
-                      'flex-1 h-0.5 mx-2',
-                      isCompleted ? 'bg-primary' : 'bg-gray-300'
-                    )}
-                  />
-                )}
+                {!isLast && <StepConnector isCompleted={isCompleted} />}
               </div>
 
-              {/* Step text */}
-              <div
-                className={`absolute -bottom-12 md:-bottom-8 ${step.id === steps.length ? '-left-9' : 'left-0'} w-full text-start`}
-              >
-                <span
-                  className={cn(
-                    'text-sm font-medium',
-                    isCurrent
-                      ? 'text-primary font-semibold'
-                      : isCompleted
-                        ? 'text-gray-900'
-                        : 'text-gray-500',
-                    isClickable && 'hover:text-primary transition-colors'
-                  )}
-                >
-                  {step.name}
-                </span>
-              </div>
+              <StepLabel
+                name={step.name}
+                isCurrent={isCurrent}
+                isCompleted={isCompleted}
+                isClickable={isClickable}
+                stepId={step.id}
+                totalSteps={steps.length}
+              />
             </li>
           )
         })}
