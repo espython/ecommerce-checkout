@@ -4,7 +4,6 @@ import { ReactNode } from 'react'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
 import {
   selectCheckoutSteps,
-  selectCurrentStep,
   selectCurrentStepId,
 } from '@/features/checkout/store/checkout-slice'
 import { Steps } from '@/shared/components/ui/steps'
