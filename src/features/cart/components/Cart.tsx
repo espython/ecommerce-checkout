@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Button } from '@/shared/components/ui/button'
-import { ShoppingCart, RefreshCw, AlertCircle } from 'lucide-react'
+import { ShoppingCart, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { CartItem as CartItemType } from '../types/cart.types'
 import { CartItem } from './CartItem'
@@ -26,7 +26,6 @@ interface CartProps {
 
 export function Cart({
   items,
-  hideTitle = false,
   hideControls = false,
   isLoading = false,
 }: CartProps) {

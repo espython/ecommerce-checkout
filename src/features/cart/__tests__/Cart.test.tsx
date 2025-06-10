@@ -1,4 +1,4 @@
-import { screen, fireEvent } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { render } from '@/test-utils/test-utils'
 import { Cart } from '@/features/cart/components/Cart'
 import { useAppSelector } from '@/shared/hooks/redux'
@@ -29,7 +29,6 @@ const createSelectorMock = (errorValue: string | null = null) => {
 }
 
 describe('Cart', () => {
-  const mockValidateCart = jest.fn()
   const mockUpdateItemQuantity = jest.fn()
   const mockRemoveItem = jest.fn()
 
