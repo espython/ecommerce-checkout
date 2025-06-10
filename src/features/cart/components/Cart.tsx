@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { CartItem as CartItemType } from '../types/cart.types'
 import { CartItem } from './CartItem'
 import { CartSkeleton } from './CartSkeleton'
-import { useCartApi } from '../hooks/use-cart'
 import { useAppSelector } from '@/shared/hooks/redux'
 import { selectCartStatus } from '../store/cart-selectors'
 import {
@@ -17,7 +16,6 @@ import {
 } from '@/shared/components/ui/alert'
 import { OrderSummarySidebar } from './OrderSummarySidebar'
 import { Card } from '@/components/ui'
-import { OrderSummaryCard } from './OrderSummaryCard'
 
 interface CartProps {
   items: CartItemType[]
@@ -33,7 +31,6 @@ export function Cart({
   isLoading = false,
 }: CartProps) {
   const { error } = useAppSelector(selectCartStatus)
-  const { validateCart } = useCartApi()
 
   if (isLoading) {
     return <CartSkeleton />
@@ -45,17 +42,6 @@ export function Cart({
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error loading cart</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
-        {!hideControls && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-2"
-            onClick={() => validateCart()}
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Try Again
-          </Button>
-        )}
       </Alert>
     )
   }
