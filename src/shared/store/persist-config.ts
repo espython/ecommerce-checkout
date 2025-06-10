@@ -9,7 +9,6 @@ import {
 } from 'redux-persist'
 import { PersistConfig } from 'redux-persist/es/types'
 import { RootState } from './index'
-import { apiSlice } from './api-slice'
 
 /**
  * Configuration for Redux Persist
@@ -20,7 +19,7 @@ export const persistConfig: PersistConfig<RootState> = {
   key: 'ecommerce-checkout-root',
   version: 1,
   storage,
-  whitelist: ['cart'], // Only persist the cart for now
+  whitelist: ['cart', 'shipping'], // Only persist the cart for now
   blacklist: ['api'], // Never persist API cache
 }
 

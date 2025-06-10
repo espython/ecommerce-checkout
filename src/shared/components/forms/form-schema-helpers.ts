@@ -32,7 +32,10 @@ export function generateValidationSchema(
       case 'tel':
         fieldValidator = z
           .string()
-          .regex(/^[0-9+\-\s()]*$/, 'Please enter a valid phone number')
+          .regex(
+            /^(\+\d{1,3})?[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/,
+            'Please enter a valid phone number'
+          )
         break
       case 'url':
         fieldValidator = z.string().url('Please enter a valid URL')

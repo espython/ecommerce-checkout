@@ -1,6 +1,7 @@
 // src/features/checkout/store/checkout-slice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '@/shared/store'
+import { CHECKOUT_STEPS } from '@/shared/constants/checkout-steps'
 
 export interface CheckoutStep {
   id: number
@@ -16,22 +17,10 @@ export interface CheckoutState {
 }
 
 const initialState: CheckoutState = {
-  steps: [
-    { id: 1, name: 'Cart Review', path: '/checkout', completed: false },
-    {
-      id: 2,
-      name: 'Shipping Information',
-      path: '/checkout/shipping',
-      completed: false,
-    },
-    { id: 3, name: 'Payment', path: '/checkout/payment', completed: false },
-    {
-      id: 4,
-      name: 'Confirmation',
-      path: '/checkout/confirmation',
-      completed: false,
-    },
-  ],
+  steps: CHECKOUT_STEPS.map((step) => ({
+    ...step,
+    completed: false,
+  })),
   currentStepId: 1,
   isComplete: false,
 }
@@ -138,10 +127,6 @@ export const selectPreviousStep = (state: RootState) => {
   }
   return null
 }
-
-const persistedStep =
-  typeof window !== 'undefined' ? localStorage.getItem('checkout_step') : null
-const initialStep = persistedStep ? parseInt(persistedStep, 10) : 1
 
 export const setCurrentStepWithPersistence =
   (step: number) => (dispatch: any) => {

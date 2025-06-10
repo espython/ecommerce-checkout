@@ -5,11 +5,9 @@ import {
   selectSaveAddress,
 } from '../store/shipping-selectors'
 import { RootState } from '@/store/index'
-import { apiSlice } from '@/shared/store/api-slice'
 
 // Create a more complete mock state with required properties
-const mockState = {
-  [apiSlice.reducerPath]: {} as any, // Mock API state
+const mockState: RootState = {
   cart: {} as any,
   shipping: {
     address: {
@@ -25,7 +23,7 @@ const mockState = {
     saveAddress: true,
   },
   checkout: {} as any,
-} as RootState // Cast to RootState
+} as unknown as RootState // Cast to RootState
 
 describe('Shipping Selectors', () => {
   test('selectShippingState returns the shipping state', () => {
