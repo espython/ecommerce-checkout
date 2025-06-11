@@ -2,10 +2,7 @@
 
 import { ReactNode } from 'react'
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/redux'
-import {
-  selectCheckoutSteps,
-  selectCurrentStep,
-} from '@/features/checkout/store/checkout-slice'
+import { selectCurrentStep } from '@/features/checkout/store/checkout-slice'
 import { Steps } from '@/shared/components/ui/steps'
 import { useEffect } from 'react'
 import { resetCheckout } from '@/features/checkout/store/checkout-slice'
