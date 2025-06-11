@@ -1,6 +1,5 @@
 'use client'
 
-import { Card } from '@/shared/components/ui/card'
 import { Cart } from './Cart'
 import { CartItem } from '../types/cart.types'
 import { CartSkeleton } from './CartSkeleton'
